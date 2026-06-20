@@ -12,12 +12,13 @@
         .task-done { opacity: 0.5; text-decoration: line-through; }
         .progress-bar { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .note-item { border-left: 4px solid #818cf8; background: #f8fafc; }
+        .kpi-card { border-bottom: 4px solid #6366f1; }
     </style>
 </head>
 <body class="p-4 md:p-10">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
-        <header class="flex justify-between items-end mb-10">
+        <header class="flex justify-between items-end mb-8">
             <div>
                 <h1 class="text-4xl font-semibold tracking-tight text-slate-900">System <span class="text-indigo-600 font-light italic">Dashboard</span></h1>
                 <p class="text-slate-500 mt-2">VcalliaX Intelligence Hub</p>
@@ -27,8 +28,28 @@
             </div>
         </header>
 
+        <!-- KPI Section (n8n Data) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card kpi-card rounded-2xl p-6 shadow-sm">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Ejecuciones Hoy</p>
+                <h3 id="kpi-executions" class="text-3xl font-semibold text-slate-800">--</h3>
+            </div>
+            <div class="glass-card kpi-card rounded-2xl p-6 shadow-sm border-b-emerald-500">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Workflows Activos</p>
+                <h3 id="kpi-workflows" class="text-3xl font-semibold text-slate-800">--</h3>
+            </div>
+            <div class="glass-card kpi-card rounded-2xl p-6 shadow-sm border-b-amber-500">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Alertas Críticas</p>
+                <h3 id="kpi-alerts" class="text-3xl font-semibold text-slate-800">--</h3>
+            </div>
+            <div class="glass-card kpi-card rounded-2xl p-6 shadow-sm border-b-slate-400">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1">Última Sincro</p>
+                <h3 id="kpi-time" class="text-sm font-semibold text-slate-600 mt-2">--:--</h3>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- COLUMNA IZQUIERDA: Radar y Status -->
+            <!-- COLUMNA IZQUIERDA -->
             <div class="space-y-6">
                 <section class="glass-card rounded-3xl p-8 shadow-sm">
                     <h2 class="text-xl font-semibold mb-6 flex items-center">
@@ -37,22 +58,21 @@
                     </h2>
                     <div id="projects-container" class="space-y-6"></div>
                 </section>
-
+                
                 <section class="glass-card rounded-3xl p-6 shadow-sm bg-slate-900 text-white border-none">
                     <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center">
                         <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
-                        System Status
+                        Status: n8n Connected
                     </h2>
-                    <div class="space-y-3">
-                        <div class="flex justify-between text-xs font-medium"><span>GitHub Sync</span><span class="text-green-400">Active</span></div>
-                        <div class="flex justify-between text-xs font-medium"><span>Data Stream</span><span class="text-indigo-400">Markdown-based</span></div>
+                    <div class="space-y-3 opacity-80">
+                        <div class="flex justify-between text-xs"><span>Mode</span><span class="font-bold">Auto-Sync</span></div>
+                        <div class="flex justify-between text-xs"><span>Source</span><span class="font-bold">SYSTEM.json</span></div>
                     </div>
                 </section>
             </div>
 
-            <!-- COLUMNA CENTRAL/DERECHA: Tareas y Notas -->
+            <!-- COLUMNA DERECHA -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Tareas -->
                 <section class="glass-card rounded-3xl p-8 shadow-sm">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center mb-6">
                         <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
@@ -61,15 +81,12 @@
                     <div id="tasks-container" class="space-y-3"></div>
                 </section>
 
-                <!-- Notas Rápidas -->
                 <section class="glass-card rounded-3xl p-8 shadow-sm">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center mb-6">
                         <svg class="w-5 h-5 mr-2 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         Notas Rápidas
                     </h2>
-                    <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Las notas se cargarán aquí -->
-                    </div>
+                    <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </section>
             </div>
         </div>
@@ -77,6 +94,17 @@
 
     <script>
         document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        async function loadSystemMetrics() {
+            try {
+                const response = await fetch('SYSTEM.json');
+                const data = await response.json();
+                document.getElementById('kpi-executions').innerText = data.executions_today;
+                document.getElementById('kpi-workflows').innerText = data.active_workflows;
+                document.getElementById('kpi-alerts').innerText = data.critical_alerts;
+                document.getElementById('kpi-time').innerText = data.last_execution;
+            } catch (e) { console.error("Error cargando métricas"); }
+        }
 
         async function loadTasks() {
             const container = document.getElementById('tasks-container');
@@ -86,13 +114,12 @@
                 container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
                     const isDone = line.includes('[x]');
                     const taskText = line.replace(/^- \[[ x]\] /, '').replace(/^- /, '');
-                    return `
-                        <div class="flex items-center p-3 bg-white/50 rounded-xl border border-slate-100 transition-all ${isDone ? 'task-done' : 'hover:border-indigo-100'}">
-                            <div class="w-5 h-5 rounded-full border-2 ${isDone ? 'bg-indigo-500 border-indigo-500' : 'border-indigo-300'} mr-3 flex-shrink-0 flex items-center justify-center">
-                                ${isDone ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' : ''}
-                            </div>
-                            <span class="text-sm font-medium text-slate-700">${taskText}</span>
-                        </div>`;
+                    return `<div class="flex items-center p-3 bg-white/50 rounded-xl border border-slate-100 transition-all ${isDone ? 'task-done' : 'hover:border-indigo-100'}">
+                        <div class="w-5 h-5 rounded-full border-2 ${isDone ? 'bg-indigo-500 border-indigo-500' : 'border-indigo-300'} mr-3 flex-shrink-0 flex items-center justify-center">
+                            ${isDone ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' : ''}
+                        </div>
+                        <span class="text-sm font-medium text-slate-700">${taskText}</span>
+                    </div>`;
                 }).join('');
             } catch (e) { container.innerHTML = "Error cargando tareas."; }
         }
@@ -103,16 +130,15 @@
                 const response = await fetch('PROJECTS.md');
                 const text = await response.text();
                 container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
-                    const [name, progress, status] = line.replace(/^- /, '').split('|').map(p => p.trim());
+                    const [name, progress] = line.replace(/^- /, '').split('|').map(p => p.trim());
                     const percent = progress ? progress.replace('%', '') : '0';
-                    return `
-                        <div>
-                            <div class="flex justify-between mb-1.5"><span class="text-xs font-bold text-slate-600">${name}</span><span class="text-xs font-bold text-indigo-600">${progress}</span></div>
-                            <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="progress-bar bg-indigo-500 h-1.5 rounded-full" style="width: 0%" data-target="${percent}%"></div></div>
-                        </div>`;
+                    return `<div>
+                        <div class="flex justify-between mb-1.5"><span class="text-xs font-bold text-slate-600">${name}</span><span class="text-xs font-bold text-indigo-600">${progress}</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="progress-bar bg-indigo-500 h-1.5 rounded-full" style="width: 0%" data-target="${percent}%"></div></div>
+                    </div>`;
                 }).join('');
                 setTimeout(() => document.querySelectorAll('.progress-bar').forEach(b => b.style.width = b.dataset.target), 100);
-            } catch (e) { container.innerHTML = "Crea PROJECTS.md."; }
+            } catch (e) { container.innerHTML = "Error en proyectos."; }
         }
 
         async function loadNotes() {
@@ -121,15 +147,14 @@
                 const response = await fetch('NOTES.md');
                 const text = await response.text();
                 container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
-                    const noteText = line.replace(/^- /, '');
-                    return `
-                        <div class="note-item p-4 rounded-r-xl shadow-sm hover:shadow-md transition-shadow">
-                            <p class="text-sm text-slate-600 leading-relaxed">${noteText}</p>
-                        </div>`;
+                    return `<div class="note-item p-4 rounded-r-xl shadow-sm hover:shadow-md transition-shadow">
+                        <p class="text-sm text-slate-600 leading-relaxed">${line.replace(/^- /, '')}</p>
+                    </div>`;
                 }).join('');
-            } catch (e) { container.innerHTML = "<p class='text-slate-400 italic text-sm'>Aún no hay notas en NOTES.md</p>"; }
+            } catch (e) { container.innerHTML = "Error en notas."; }
         }
 
+        loadSystemMetrics();
         loadTasks();
         loadProjects();
         loadNotes();
