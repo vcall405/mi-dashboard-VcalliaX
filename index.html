@@ -9,11 +9,11 @@
     <style>
         body { font-family: 'Outfit', sans-serif; background-color: #fcfcfd; }
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(229, 231, 235, 0.5); }
+        .task-done { opacity: 0.5; text-decoration: line-through; }
     </style>
 </head>
 <body class="p-4 md:p-12">
     <div class="max-w-5xl mx-auto">
-        <!-- Header -->
         <header class="flex justify-between items-end mb-12">
             <div>
                 <h1 class="text-4xl font-semibold text-slate-900 tracking-tight">System <span class="text-indigo-600 font-light italic">Dashboard</span></h1>
@@ -25,49 +25,32 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Tareas Principales -->
             <div class="lg:col-span-2 space-y-6">
                 <section class="glass-card rounded-3xl p-8 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold text-slate-800 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                            Próximas Tareas (TASKS.md)
-                        </h2>
-                    </div>
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center mb-6">
+                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        Tareas desde TASKS.md
+                    </h2>
                     <div id="tasks-container" class="space-y-4 text-slate-600">
-                        <div class="flex items-center p-4 bg-white/50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors cursor-pointer">
-                            <div class="w-6 h-6 rounded-full border-2 border-indigo-400 mr-4 flex-shrink-0"></div>
-                            <span>Finalizar configuración de GitHub Pages para el Dashboard</span>
-                        </div>
-                        <div class="flex items-center p-4 bg-white/50 rounded-2xl border border-slate-100 opacity-60">
-                            <div class="w-6 h-6 rounded-full bg-indigo-500 mr-4 flex-shrink-0 flex items-center justify-center">
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="line-through">Diseño inicial de la interfaz</span>
-                        </div>
+                        <p class="text-sm italic">Cargando tareas...</p>
                     </div>
                 </section>
             </div>
 
-            <!-- Memoria / Contexto -->
             <div class="space-y-6">
                 <section class="glass-card rounded-3xl p-8 shadow-sm bg-indigo-600 text-white border-none">
                     <h2 class="text-xl font-semibold mb-6 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Memoria de Trabajo
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Estado del Sistema
                     </h2>
                     <div class="space-y-4">
-                        <div>
-                            <p class="text-indigo-100 text-xs uppercase font-bold tracking-widest mb-2">Proyectos</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="px-3 py-1 bg-white/20 rounded-full text-xs">n8n Automation</span>
-                                <span class="px-3 py-1 bg-white/20 rounded-full text-xs">GitHub Sync</span>
-                            </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span>GitHub Pages</span>
+                            <span class="px-2 py-1 bg-green-400/20 rounded text-xs">Online</span>
                         </div>
-                        <hr class="border-white/10">
-                        <div>
-                            <p class="text-indigo-100 text-xs uppercase font-bold tracking-widest mb-2">Contexto Reciente</p>
-                            <p class="text-sm leading-relaxed">Configurando sistema de visualización para el flujo de trabajo de VcalliaX.</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span>Sincronización</span>
+                            <span class="px-2 py-1 bg-white/20 rounded text-xs">Auto-fetch</span>
                         </div>
                     </div>
                 </section>
@@ -76,7 +59,44 @@
     </div>
 
     <script>
+        // Mostrar fecha actual
         document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Función para cargar y procesar TASKS.md
+        async function loadTasks() {
+            const container = document.getElementById('tasks-container');
+            try {
+                const response = await fetch('TASKS.md');
+                if (!response.ok) throw new Error('No se encontró TASKS.md');
+                
+                const text = await response.text();
+                const lines = text.split('\n');
+                
+                container.innerHTML = ''; // Limpiar contenedor
+                
+                lines.forEach(line => {
+                    if (line.trim().startsWith('-')) {
+                        const isDone = line.includes('[x]');
+                        const taskText = line.replace(/^- \[[ x]\] /, '').replace(/^- /, '');
+                        
+                        const taskElement = document.createElement('div');
+                        taskElement.className = `flex items-center p-4 bg-white/50 rounded-2xl border border-slate-100 transition-all ${isDone ? 'task-done' : 'hover:border-indigo-200'}`;
+                        
+                        taskElement.innerHTML = `
+                            <div class="w-6 h-6 rounded-full border-2 ${isDone ? 'bg-indigo-500 border-indigo-500' : 'border-indigo-400'} mr-4 flex-shrink-0 flex items-center justify-center">
+                                ${isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' : ''}
+                            </div>
+                            <span class="font-medium">${taskText}</span>
+                        `;
+                        container.appendChild(taskElement);
+                    }
+                });
+            } catch (error) {
+                container.innerHTML = `<p class="text-red-400">Error: Crea un archivo TASKS.md en el repo para ver tus tareas.</p>`;
+            }
+        }
+
+        loadTasks();
     </script>
 </body>
 </html>
