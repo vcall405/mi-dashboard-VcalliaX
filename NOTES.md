@@ -1,0 +1,4 @@
+- El color de marca para el nuevo proyecto es #4F46E5.
+- Revisar la documentación de la API de Telegram el viernes.
+- Idea: Integrar el Dashboard con un bot de voz.
+- Contacto soporte: support@example.com
