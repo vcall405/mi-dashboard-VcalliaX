@@ -1,4 +1,4 @@
 - [x] Configurar el flujo de n8n
 - [x] Revisar logs de la base de datos
 - [x] Crear el repositorio del Dashboard
-- [ ] Diseñar el sistema de notificaciones
+- [x] Diseñar el sistema de notificaciones
