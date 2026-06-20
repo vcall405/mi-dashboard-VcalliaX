@@ -3,192 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VcalliaX Intelligence Hub</title>
-
+    <title>VcalliaX Operations</title>
     <script>
         (() => {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.classList.toggle('dark', savedTheme === 'dark' || (!savedTheme && prefersDark));
+            const saved = localStorage.getItem('theme');
+            document.documentElement.classList.toggle('dark', saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches));
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' };
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class' };</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; transition-duration: 300ms; }
+        * { letter-spacing: 0; }
         body { font-family: 'Outfit', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.7); }
-        .dark .glass-card { background: rgba(15, 23, 42, 0.72); border-color: rgba(71, 85, 105, 0.45); }
-        .task-done { opacity: 0.5; text-decoration: line-through; }
-        .progress-bar { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .note-item { border-left: 4px solid #818cf8; background: #f8fafc; }
-        .dark .note-item { background: rgba(30, 41, 59, 0.72); border-left-color: #a5b4fc; }
-        .kpi-card { border-bottom: 4px solid #6366f1; }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+        .surface { background: rgba(255,255,255,.86); border: 1px solid rgba(203,213,225,.7); backdrop-filter: blur(12px); }
+        .dark .surface { background: rgba(15,23,42,.78); border-color: rgba(51,65,85,.8); }
+        .pulse-bar { transform-origin: bottom; animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+        @keyframes rise { from { transform: scaleY(.05); opacity: .25; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 p-4 text-slate-800 transition-all duration-300 dark:bg-slate-950 dark:text-slate-100 md:p-10">
-    <div class="mx-auto max-w-6xl">
-        <header class="mb-8 flex items-end justify-between gap-4">
-            <div>
-                <h1 class="text-3xl font-semibold tracking-normal text-slate-900 dark:text-slate-100 md:text-4xl">System <span class="font-light italic text-indigo-600 dark:text-indigo-400">Dashboard</span></h1>
-                <p class="mt-2 text-slate-500 dark:text-slate-400">VcalliaX Intelligence Hub</p>
+<body class="min-h-screen bg-slate-100 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <main class="mx-auto max-w-[1500px] px-4 py-5 md:px-8 md:py-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5 dark:border-slate-800">
+            <div class="flex items-center gap-4">
+                <div class="grid h-11 w-11 place-items-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 17l4-5 4 3 5-8 3 4M4 21h16"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-950 dark:text-white">VcalliaX Operations</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Monitoreo operativo de n8n</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div id="date-display" class="hidden text-right text-sm font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 md:block"></div>
-                <button id="theme-toggle" type="button" class="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm hover:border-indigo-300 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-amber-300 dark:hover:border-amber-400 dark:hover:text-amber-200 dark:focus:ring-offset-slate-950" aria-label="Activar modo oscuro" aria-pressed="false" title="Cambiar tema">
-                    <svg id="moon-icon" class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
-                    <svg id="sun-icon" class="hidden h-5 w-5 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+            <div class="flex items-center gap-2">
+                <div id="health-badge" class="flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-semibold"></div>
+                <button id="refresh-button" type="button" class="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:border-indigo-400 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300" title="Actualizar datos" aria-label="Actualizar datos">
+                    <svg id="refresh-icon" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8.1 8.1 0 00-15.5-2M4 4v5h5m-5 4a8.1 8.1 0 0015.5 2M20 20v-5h-5"></path></svg>
+                </button>
+                <button id="theme-toggle" type="button" class="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:border-indigo-400 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-amber-300" aria-label="Activar modo oscuro">
+                    <svg class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"></path></svg>
+                    <svg class="hidden h-5 w-5 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path stroke-linecap="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"></path></svg>
                 </button>
             </div>
         </header>
 
-        <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div class="glass-card kpi-card rounded-lg p-6 shadow-sm dark:shadow-black/20">
-                <p class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Ejecuciones Hoy</p>
-                <h3 id="kpi-executions" class="text-3xl font-semibold text-slate-800 dark:text-slate-100">--</h3>
-            </div>
-            <div class="glass-card kpi-card rounded-lg border-b-emerald-500 p-6 shadow-sm dark:shadow-black/20">
-                <p class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Workflows Activos</p>
-                <h3 id="kpi-workflows" class="text-3xl font-semibold text-slate-800 dark:text-slate-100">--</h3>
-            </div>
-            <div class="glass-card kpi-card rounded-lg border-b-amber-500 p-6 shadow-sm dark:shadow-black/20">
-                <p class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Alertas Críticas</p>
-                <h3 id="kpi-alerts" class="text-3xl font-semibold text-slate-800 dark:text-slate-100">--</h3>
-            </div>
-            <div class="glass-card kpi-card rounded-lg border-b-slate-400 p-6 shadow-sm dark:shadow-black/20">
-                <p class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Última Sincro</p>
-                <h3 id="kpi-time" class="mt-2 text-sm font-semibold text-slate-600 dark:text-slate-200">--:--</h3>
-            </div>
-        </div>
+        <section class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Ejecuciones hoy</p><p id="kpi-executions" class="mt-2 text-3xl font-bold">--</p><p id="kpi-successful" class="mt-1 text-xs text-slate-500"></p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Tasa de éxito</p><p id="kpi-success-rate" class="mt-2 text-3xl font-bold">--%</p><div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="success-progress" class="h-full rounded-full bg-emerald-500 transition-all duration-700" style="width:0%"></div></div></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Workflows activos</p><p id="kpi-workflows" class="mt-2 text-3xl font-bold">--</p><p class="mt-1 text-xs text-slate-500">publicados en n8n</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Errores hoy</p><p id="kpi-alerts" class="mt-2 text-3xl font-bold text-rose-600 dark:text-rose-400">--</p><p class="mt-1 text-xs text-slate-500">Telegram vigila los nuevos</p></article>
+            <article class="surface col-span-2 rounded-lg p-4 lg:col-span-1"><p class="text-xs font-semibold uppercase text-slate-500">Última sincronización</p><p id="kpi-time" class="mt-2 text-3xl font-bold">--:--</p><p id="refresh-status" class="mt-1 text-xs text-slate-500">Actualiza en 60s</p></article>
+        </section>
 
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div class="space-y-6">
-                <section class="glass-card rounded-lg p-8 shadow-sm dark:shadow-black/20">
-                    <h2 class="mb-6 flex items-center text-xl font-semibold text-slate-800 dark:text-slate-100">
-                        <svg class="mr-2 h-5 w-5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                        Radar de Proyectos
-                    </h2>
-                    <div id="projects-container" class="space-y-6"></div>
-                </section>
+        <section class="mb-6 grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+            <article class="surface min-w-0 rounded-lg p-5">
+                <div class="mb-5 flex items-center justify-between"><div><h2 class="text-lg font-bold">Pulso de ejecuciones</h2><p class="text-xs text-slate-500">Actividad por hora · verde correcto · rojo error</p></div><span id="date-display" class="text-xs font-semibold text-slate-500"></span></div>
+                <div id="activity-chart" class="flex h-48 items-end gap-1 border-b border-slate-200 pb-6 dark:border-slate-700"></div>
+            </article>
+            <article class="surface min-w-0 rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between"><div><h2 class="text-lg font-bold">Actividad reciente</h2><p class="text-xs text-slate-500">Últimas 12 ejecuciones registradas</p></div><a href="https://n8n2.vcallia.com/home/workflows" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir n8n</a></div>
+                <div id="executions-list" class="max-h-80 space-y-1 overflow-auto pr-1"></div>
+            </article>
+        </section>
 
-                <section class="rounded-lg border border-slate-800 bg-slate-900 p-6 text-white shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
-                    <h2 class="mb-4 flex items-center text-sm font-bold uppercase tracking-widest text-slate-400">
-                        <span class="mr-2 h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
-                        Status: n8n Connected
-                    </h2>
-                    <div class="space-y-3 text-slate-300">
-                        <div class="flex justify-between text-xs"><span>Mode</span><span class="font-bold text-white">Auto-Sync</span></div>
-                        <div class="flex justify-between text-xs"><span>Source</span><span class="font-bold text-white">SYSTEM.json</span></div>
-                    </div>
-                </section>
-            </div>
+        <section class="surface mb-6 overflow-hidden rounded-lg">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5 dark:border-slate-700"><div><h2 class="text-lg font-bold">Salud por workflow</h2><p class="text-xs text-slate-500">Errores primero, luego volumen de actividad</p></div><input id="workflow-search" type="search" placeholder="Buscar workflow" class="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 sm:w-64"></div>
+            <div class="overflow-x-auto"><table class="w-full min-w-[760px] text-left text-sm"><thead class="bg-slate-100/80 text-xs uppercase text-slate-500 dark:bg-slate-900/80"><tr><th class="px-5 py-3">Workflow</th><th class="px-5 py-3">Estado</th><th class="px-5 py-3">Ejecuciones</th><th class="px-5 py-3">Errores</th><th class="px-5 py-3">Éxito</th><th class="px-5 py-3">Última actividad</th><th class="px-5 py-3"></th></tr></thead><tbody id="workflows-table" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody></table></div>
+        </section>
 
-            <div class="space-y-6 lg:col-span-2">
-                <section class="glass-card rounded-lg p-8 shadow-sm dark:shadow-black/20">
-                    <h2 class="mb-6 flex items-center text-xl font-semibold text-slate-800 dark:text-slate-100">
-                        <svg class="mr-2 h-5 w-5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        Próximas Tareas
-                    </h2>
-                    <div id="tasks-container" class="space-y-3"></div>
-                </section>
-
-                <section class="glass-card rounded-lg p-8 shadow-sm dark:shadow-black/20">
-                    <h2 class="mb-6 flex items-center text-xl font-semibold text-slate-800 dark:text-slate-100">
-                        <svg class="mr-2 h-5 w-5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        Notas Rápidas
-                    </h2>
-                    <div id="notes-container" class="grid grid-cols-1 gap-4 md:grid-cols-2"></div>
-                </section>
-            </div>
-        </div>
-    </div>
+        <section class="grid gap-6 lg:grid-cols-3">
+            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Proyectos</h2><div id="projects-container" class="space-y-4"></div></article>
+            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Tareas</h2><div id="tasks-container" class="space-y-2"></div></article>
+            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Notas</h2><div id="notes-container" class="space-y-2"></div></article>
+        </section>
+    </main>
 
     <script>
         const root = document.documentElement;
         const themeToggle = document.getElementById('theme-toggle');
+        const refreshButton = document.getElementById('refresh-button');
+        let dashboardData = null;
+        let refreshCountdown = 60;
+
+        const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+        const statusMeta = status => ({ success:['Correcto','bg-emerald-500','text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/40'], error:['Error','bg-rose-500','text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'], crashed:['Caído','bg-rose-500','text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'], waiting:['En espera','bg-amber-500','text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40'], running:['Ejecutando','bg-sky-500','text-sky-700 bg-sky-50 dark:text-sky-300 dark:bg-sky-950/40']}[status] || ['Sin datos','bg-slate-400','text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-slate-800']);
+        const formatTime = date => date ? new Intl.DateTimeFormat('es-ES',{hour:'2-digit',minute:'2-digit'}).format(new Date(date)) : 'Sin datos';
+        const formatDuration = ms => ms == null ? '—' : ms < 1000 ? `${ms} ms` : `${(ms/1000).toFixed(ms < 10000 ? 1 : 0)} s`;
 
         function updateThemeButton() {
-            const isDark = root.classList.contains('dark');
-            themeToggle.setAttribute('aria-label', isDark ? 'Activar modo claro' : 'Activar modo oscuro');
-            themeToggle.setAttribute('aria-pressed', String(isDark));
+            const dark = root.classList.contains('dark');
+            themeToggle.setAttribute('aria-label', dark ? 'Activar modo claro' : 'Activar modo oscuro');
+        }
+        themeToggle.addEventListener('click', () => { const dark = root.classList.toggle('dark'); localStorage.setItem('theme', dark ? 'dark' : 'light'); updateThemeButton(); });
+        updateThemeButton();
+
+        function renderHealth(data) {
+            const states = { healthy:['Operación estable','bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-300','bg-emerald-500'], degraded:['Atención requerida','bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-300','bg-amber-500'], critical:['Estado crítico','bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900 dark:text-rose-300','bg-rose-500']};
+            const [label, classes, dot] = states[data.health] || states.degraded;
+            document.getElementById('health-badge').className = `flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-semibold ${classes}`;
+            document.getElementById('health-badge').innerHTML = `<span class="h-2 w-2 rounded-full ${dot}"></span>${label}`;
         }
 
-        themeToggle.addEventListener('click', () => {
-            const isDark = root.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeButton();
-        });
+        function renderMetrics(data) {
+            document.getElementById('kpi-executions').textContent = data.executions_today ?? 0;
+            document.getElementById('kpi-successful').textContent = `${data.successful_today ?? 0} completadas correctamente`;
+            document.getElementById('kpi-success-rate').textContent = `${data.success_rate ?? 0}%`;
+            document.getElementById('success-progress').style.width = `${data.success_rate ?? 0}%`;
+            document.getElementById('kpi-workflows').textContent = data.active_workflows ?? 0;
+            document.getElementById('kpi-alerts').textContent = data.critical_alerts ?? 0;
+            document.getElementById('kpi-time').textContent = data.last_execution || '--:--';
+            renderHealth(data);
+        }
 
-        updateThemeButton();
-        document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        function renderActivity(items = []) {
+            const max = Math.max(1, ...items.map(item => item.total));
+            document.getElementById('activity-chart').innerHTML = items.map((item, index) => {
+                const success = Math.max(0, item.total - item.errors);
+                const totalHeight = Math.max(item.total ? 12 : 2, (item.total / max) * 100);
+                const errorHeight = item.total ? (item.errors / item.total) * totalHeight : 0;
+                const showLabel = index % 3 === 0;
+                return `<div class="group relative flex h-full min-w-0 flex-1 items-end" title="${item.hour}: ${item.total} ejecuciones, ${item.errors} errores"><div class="pulse-bar relative w-full overflow-hidden rounded-t-sm bg-indigo-500/15" style="height:${totalHeight}%"><div class="absolute bottom-0 w-full bg-emerald-500" style="height:${Math.max(0,totalHeight-errorHeight)}%"></div><div class="absolute top-0 w-full bg-rose-500" style="height:${errorHeight}%"></div></div>${showLabel ? `<span class="absolute -bottom-5 left-0 text-[9px] text-slate-400">${item.hour.slice(0,2)}</span>` : ''}</div>`;
+            }).join('');
+        }
+
+        function renderExecutions(items = []) {
+            document.getElementById('executions-list').innerHTML = items.length ? items.map(item => {
+                const [label,dot] = statusMeta(item.status);
+                return `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="grid grid-cols-[10px_1fr_auto] items-center gap-3 rounded-md px-2 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800"><span class="h-2 w-2 rounded-full ${dot}"></span><span class="min-w-0"><span class="block truncate text-sm font-semibold">${escapeHtml(item.workflow_name)}</span><span class="text-xs text-slate-500">${escapeHtml(item.mode)} · ${formatDuration(item.duration_ms)}</span></span><span class="text-right text-xs text-slate-500"><span class="block">${label}</span>${formatTime(item.started_at)}</span></a>`;
+            }).join('') : '<p class="py-8 text-center text-sm text-slate-500">No hay ejecuciones recientes.</p>';
+        }
+
+        function renderWorkflows(items = dashboardData?.workflows || []) {
+            const query = document.getElementById('workflow-search').value.trim().toLowerCase();
+            const filtered = items.filter(item => item.name.toLowerCase().includes(query));
+            document.getElementById('workflows-table').innerHTML = filtered.map(item => {
+                const [label,,badge] = statusMeta(item.last_status);
+                const rate = item.success_rate == null ? '—' : `${item.success_rate}%`;
+                return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-900/60"><td class="max-w-sm px-5 py-3"><div class="truncate font-semibold" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div><div class="text-xs text-slate-400">${escapeHtml(item.id)}</div></td><td class="px-5 py-3"><span class="inline-flex rounded px-2 py-1 text-xs font-semibold ${badge}">${label}</span></td><td class="px-5 py-3 font-semibold">${item.executions_today}</td><td class="px-5 py-3 ${item.errors_today ? 'font-bold text-rose-600 dark:text-rose-400' : ''}">${item.errors_today}</td><td class="px-5 py-3">${rate}</td><td class="px-5 py-3 text-slate-500">${formatTime(item.last_started_at)}</td><td class="px-5 py-3 text-right"><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir</a></td></tr>`;
+            }).join('') || '<tr><td colspan="7" class="px-5 py-10 text-center text-slate-500">No hay coincidencias.</td></tr>';
+        }
 
         async function loadSystemMetrics() {
+            refreshButton.disabled = true;
+            document.getElementById('refresh-icon').classList.add('animate-spin');
             try {
                 const response = await fetch(`SYSTEM.json?v=${Date.now()}`, { cache: 'no-store' });
-                const data = await response.json();
-                document.getElementById('kpi-executions').innerText = data.executions_today;
-                document.getElementById('kpi-workflows').innerText = data.active_workflows;
-                document.getElementById('kpi-alerts').innerText = data.critical_alerts;
-                document.getElementById('kpi-time').innerText = data.last_execution;
-            } catch (e) { console.error('Error cargando métricas', e); }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                dashboardData = await response.json();
+                renderMetrics(dashboardData); renderActivity(dashboardData.hourly_activity); renderExecutions(dashboardData.recent_executions); renderWorkflows();
+                refreshCountdown = 60;
+            } catch (error) {
+                document.getElementById('health-badge').className = 'flex h-10 items-center gap-2 rounded-lg border border-rose-300 bg-rose-50 px-3 text-sm font-semibold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300';
+                document.getElementById('health-badge').textContent = 'Datos no disponibles';
+                console.error('Error cargando métricas', error);
+            } finally { refreshButton.disabled = false; document.getElementById('refresh-icon').classList.remove('animate-spin'); }
         }
 
-        async function loadTasks() {
-            const container = document.getElementById('tasks-container');
-            try {
-                const response = await fetch(`TASKS.md?v=${Date.now()}`, { cache: 'no-store' });
-                const text = await response.text();
-                container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
-                    const isDone = line.includes('[x]');
-                    const taskText = line.replace(/^- \[[ x]\] /, '').replace(/^- /, '');
-                    return `<div class="flex items-center rounded-lg border border-slate-100 bg-white/50 p-3 transition-all duration-300 dark:border-slate-700/70 dark:bg-slate-800/60 ${isDone ? 'task-done' : 'hover:border-indigo-200 dark:hover:border-indigo-500/60'}">
-                        <div class="mr-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 ${isDone ? 'border-indigo-500 bg-indigo-500' : 'border-indigo-300 dark:border-indigo-400'}">
-                            ${isDone ? '<svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' : ''}
-                        </div>
-                        <span class="text-sm font-medium text-slate-700 dark:text-slate-200">${taskText}</span>
-                    </div>`;
-                }).join('');
-            } catch (e) { container.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">Error cargando tareas.</p>'; }
+        async function loadMarkdown() {
+            const request = name => fetch(`${name}?v=${Date.now()}`, { cache:'no-store' }).then(response => response.text());
+            const [projects,tasks,notes] = await Promise.all([request('PROJECTS.md'),request('TASKS.md'),request('NOTES.md')]);
+            document.getElementById('projects-container').innerHTML = projects.split('\n').filter(line => line.trim().startsWith('-')).map(line => { const [name,progress] = line.replace(/^- /,'').split('|').map(x=>x.trim()); return `<div><div class="mb-1 flex justify-between text-xs"><span class="font-semibold">${escapeHtml(name)}</span><span class="text-indigo-600 dark:text-indigo-400">${escapeHtml(progress || '0%')}</span></div><div class="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"><div class="h-full rounded-full bg-indigo-500" style="width:${parseInt(progress)||0}%"></div></div></div>`; }).join('');
+            document.getElementById('tasks-container').innerHTML = tasks.split('\n').filter(line=>line.trim().startsWith('-')).map(line=>{ const done=line.includes('[x]'); const text=line.replace(/^- \[[ x]\] /,'').replace(/^- /,''); return `<div class="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 ${done?'text-slate-400 line-through':''}"><span class="grid h-4 w-4 place-items-center rounded-full border ${done?'border-emerald-500 bg-emerald-500 text-white':'border-slate-400'}">${done?'✓':''}</span>${escapeHtml(text)}</div>`;}).join('');
+            document.getElementById('notes-container').innerHTML = notes.split('\n').filter(line=>line.trim().startsWith('-')).map(line=>`<p class="border-l-2 border-amber-400 pl-3 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(line.replace(/^- /,''))}</p>`).join('');
         }
 
-        async function loadProjects() {
-            const container = document.getElementById('projects-container');
-            try {
-                const response = await fetch(`PROJECTS.md?v=${Date.now()}`, { cache: 'no-store' });
-                const text = await response.text();
-                container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
-                    const [name, progress] = line.replace(/^- /, '').split('|').map(part => part.trim());
-                    const percent = progress ? progress.replace('%', '') : '0';
-                    return `<div>
-                        <div class="mb-1.5 flex justify-between"><span class="text-xs font-bold text-slate-600 dark:text-slate-300">${name}</span><span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">${progress || '0%'}</span></div>
-                        <div class="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700"><div class="progress-bar h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" style="width: 0%" data-target="${percent}%"></div></div>
-                    </div>`;
-                }).join('');
-                setTimeout(() => document.querySelectorAll('.progress-bar').forEach(bar => { bar.style.width = bar.dataset.target; }), 100);
-            } catch (e) { container.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">Error en proyectos.</p>'; }
-        }
-
-        async function loadNotes() {
-            const container = document.getElementById('notes-container');
-            try {
-                const response = await fetch(`NOTES.md?v=${Date.now()}`, { cache: 'no-store' });
-                const text = await response.text();
-                container.innerHTML = text.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
-                    return `<div class="note-item rounded-r-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md dark:shadow-black/20">
-                        <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-200">${line.replace(/^- /, '')}</p>
-                    </div>`;
-                }).join('');
-            } catch (e) { container.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400">Error en notas.</p>'; }
-        }
-
-        loadSystemMetrics();
-        loadTasks();
-        loadProjects();
-        loadNotes();
+        refreshButton.addEventListener('click', loadSystemMetrics);
+        document.getElementById('workflow-search').addEventListener('input', () => renderWorkflows());
+        document.getElementById('date-display').textContent = new Intl.DateTimeFormat('es-ES',{weekday:'short',day:'numeric',month:'short'}).format(new Date());
+        setInterval(() => { refreshCountdown--; document.getElementById('refresh-status').textContent = `Actualiza en ${Math.max(0,refreshCountdown)}s`; if (refreshCountdown <= 0) loadSystemMetrics(); }, 1000);
+        loadSystemMetrics(); loadMarkdown().catch(error => console.error('Error cargando archivos auxiliares', error));
     </script>
 </body>
 </html>
