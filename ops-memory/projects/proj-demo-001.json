@@ -1,0 +1,14 @@
+{
+  "project_id": "proj-demo-001",
+  "name": "Vcallia Operations Dashboard",
+  "status": "active",
+  "owner": "codex-kimi",
+  "repo": "vcall405/mi-dashboard-VcalliaX",
+  "summary": "Dashboard operativo y memoria remota para automatizaciones",
+  "current_focus": "consolidar memoria operativa remota",
+  "next_actions": [
+    "Definir esquema de metadatos para registros de proyectos",
+    "Automatizar sincronización de tareas entre n8n y memoria remota",
+    "Documentar endpoints y flujos del dashboard operativo"
+  ]
+}
