@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "updated_by": "kimi",
+  "collections": ["projects", "tasks", "activity"],
+  "project_ids": ["proj-demo-001"]
+}
