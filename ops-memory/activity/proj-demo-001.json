@@ -23,5 +23,10 @@
     "type": "workflow_request",
     "source": "kimi",
     "summary": "Se solicitó el draft del workflow 'Telegram Alert Sync' para enviar alertas operativas desde n8n hacia Telegram"
+  },
+  {
+    "type": "validation",
+    "source": "kimi",
+    "summary": "Se validaron las rutas deterministicas del asistente Kimi para workflows y proyectos web."
   }
 ]
