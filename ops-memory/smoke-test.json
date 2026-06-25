@@ -1,7 +1,6 @@
 {
   "project_id": "smoke-test",
-  "status": "updated",
+  "status": "guardrail-test",
   "source": "kimi",
-  "checked_by": "kimi",
-  "checked_at": "2025-06-06T12:00:00.000Z"
+  "checked_by": "kimi"
 }
