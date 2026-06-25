@@ -3,5 +3,10 @@
     "type": "bootstrap",
     "source": "kimi",
     "summary": "Inicialización de memoria operativa remota para proj-demo-001"
+  },
+  {
+    "type": "status_update",
+    "source": "kimi",
+    "summary": "Inicio de sincronizacion n8n a GitHub ops-memory; task-002 en progreso"
   }
 ]
