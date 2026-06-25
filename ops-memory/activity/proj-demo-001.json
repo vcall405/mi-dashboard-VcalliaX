@@ -28,5 +28,10 @@
     "type": "validation",
     "source": "kimi",
     "summary": "Se validaron las rutas deterministicas del asistente Kimi para workflows y proyectos web."
+  },
+  {
+    "type": "validación",
+    "source": "kimi",
+    "summary": "Se validaron los contratos de respuesta estructurada del asistente."
   }
 ]
