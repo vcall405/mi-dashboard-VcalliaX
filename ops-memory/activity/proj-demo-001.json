@@ -13,5 +13,10 @@
     "type": "webhook_sync_test",
     "source": "ops-memory-sync-webhook",
     "summary": "Prueba de escritura por webhook completada"
+  },
+  {
+    "type": "connection_established",
+    "source": "kimi",
+    "summary": "Kimi Task Runner conectado al agente y listo para delegacion"
   }
 ]
