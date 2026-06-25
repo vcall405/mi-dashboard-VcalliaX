@@ -8,5 +8,10 @@
     "type": "status_update",
     "source": "kimi",
     "summary": "Inicio de sincronizacion n8n a GitHub ops-memory; task-002 en progreso"
+  },
+  {
+    "type": "webhook_sync_test",
+    "source": "ops-memory-sync-webhook",
+    "summary": "Prueba de escritura por webhook completada"
   }
 ]
