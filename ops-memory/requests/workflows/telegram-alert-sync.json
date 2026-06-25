@@ -1,0 +1,8 @@
+{
+  "request_type": "workflow_draft",
+  "requested_by": "kimi",
+  "project_id": "proj-demo-001",
+  "workflow_name": "Telegram Alert Sync",
+  "workflow_prompt": "Workflow para n8n que reciba alertas operativas mediante un webhook HTTP (JSON) y las reenvíe a un chat o grupo de Telegram usando el nodo oficial de Telegram. Debe soportar campos como título, nivel de severidad (info/warning/critical), mensaje detallado y timestamp. Incluir formateo legible del mensaje, manejo básico de errores de envío, logging opcional y protección simple contra reenvíos duplicados o rate limiting.",
+  "status": "requested"
+}
