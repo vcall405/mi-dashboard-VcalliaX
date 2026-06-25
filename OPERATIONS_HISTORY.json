@@ -1,0 +1,22 @@
+{
+  "snapshots": [
+    {
+      "date": "2026-06-23",
+      "executions_today": 32,
+      "success_rate": 97,
+      "critical_alerts": 1
+    },
+    {
+      "date": "2026-06-22",
+      "executions_today": 26,
+      "success_rate": 92,
+      "critical_alerts": 3
+    },
+    {
+      "date": "2026-06-21",
+      "executions_today": 21,
+      "success_rate": 95,
+      "critical_alerts": 2
+    }
+  ]
+}
