@@ -1,20 +1,48 @@
 {
   "projects": [
-    { "name": "n8n Automation", "progress": "65%", "status": "Active" },
-    { "name": "GitHub Sync", "progress": "90%", "status": "Active" },
-    { "name": "Neural Interface", "progress": "15%", "status": "Paused" },
-    { "name": "Brand Identity", "progress": "100%", "status": "Done" }
+    {
+      "name": "n8n Automation",
+      "progress": "65%",
+      "status": "Active"
+    },
+    {
+      "name": "GitHub Sync",
+      "progress": "90%",
+      "status": "Active"
+    },
+    {
+      "name": "Neural Interface",
+      "progress": "15%",
+      "status": "Paused"
+    },
+    {
+      "name": "Brand Identity",
+      "progress": "100%",
+      "status": "Done"
+    }
   ],
   "tasks": [
-    { "text": "Configurar el flujo de n8n", "done": true },
-    { "text": "Revisar logs de la base de datos", "done": true },
-    { "text": "Crear el repositorio del dashboard", "done": true },
-    { "text": "Disenar el sistema de notificaciones", "done": true }
+    {
+      "text": "Configurar el flujo de n8n",
+      "done": true
+    },
+    {
+      "text": "Revisar logs de la base de datos",
+      "done": true
+    },
+    {
+      "text": "Crear el repositorio del Dashboard",
+      "done": true
+    },
+    {
+      "text": "Diseñar el sistema de notificaciones",
+      "done": true
+    }
   ],
   "notes": [
     "El color de marca para el nuevo proyecto es #4F46E5.",
-    "Revisar la documentacion de la API de Telegram el viernes.",
-    "Idea: integrar el dashboard con un bot de voz.",
+    "Revisar la documentación de la API de Telegram el viernes.",
+    "Idea: Integrar el Dashboard con un bot de voz.",
     "Contacto soporte: support@example.com"
   ],
   "changes": [
