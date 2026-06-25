@@ -1,0 +1,8 @@
+{
+  "request_type": "workflow_draft",
+  "requested_by": "kimi",
+  "project_id": "proj-demo-001",
+  "workflow_name": "Notion To Ops Memory Sync",
+  "workflow_prompt": "Diseñar un workflow de n8n/GitHub Actions que detecte cambios en la base de datos de Notion (prospectos/proyectos) y sincronice automáticamente el estado actualizado hacia los archivos de ops-memory en GitHub (por ejemplo, bajo ops-memory/projects/<project-id>.json). Debe incluir: trigger de polling o webhook desde Notion, mapeo de propiedades del registro a campos de memoria, lógica de upsert en GitHub vía commit sobre el archivo correspondiente, manejo de errores/reintentos y trazabilidad del cambio.",
+  "status": "requested"
+}
