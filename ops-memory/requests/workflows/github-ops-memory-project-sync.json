@@ -1,0 +1,8 @@
+{
+  "request_type": "workflow_draft",
+  "requested_by": "kimi",
+  "project_id": "proj-demo-001",
+  "workflow_name": "GitHub Ops Memory Project Sync",
+  "workflow_prompt": "Crear un workflow de n8n que sincronice project, tasks y activity hacia ops-memory en GitHub usando webhook y commits claros",
+  "status": "requested"
+}
