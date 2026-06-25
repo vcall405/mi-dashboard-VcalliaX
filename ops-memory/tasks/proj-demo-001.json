@@ -1,0 +1,20 @@
+[
+  {
+    "id": "task-001",
+    "title": "Crear estructura base de memoria remota en ops-memory/",
+    "status": "done",
+    "priority": "high"
+  },
+  {
+    "id": "task-002",
+    "title": "Conectar repositorio con flujos de n8n para actualización de estado",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "id": "task-003",
+    "title": "Validar consistencia de registros entre Notion y GitHub",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
