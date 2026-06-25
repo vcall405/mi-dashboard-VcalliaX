@@ -5,10 +5,10 @@
   "owner": "codex-kimi",
   "repo": "vcall405/mi-dashboard-VcalliaX",
   "summary": "Dashboard operativo y memoria remota para automatizaciones",
-  "current_focus": "consolidar memoria operativa remota",
+  "current_focus": "implementar sincronizacion n8n a GitHub ops-memory",
   "next_actions": [
-    "Definir esquema de metadatos para registros de proyectos",
-    "Automatizar sincronización de tareas entre n8n y memoria remota",
-    "Documentar endpoints y flujos del dashboard operativo"
+    "crear flujo de sync",
+    "actualizar estado de tareas en GitHub",
+    "registrar actividad automatica"
   ]
 }
