@@ -1,0 +1,32 @@
+{
+  "projects": [
+    { "name": "n8n Automation", "progress": "65%", "status": "Active" },
+    { "name": "GitHub Sync", "progress": "90%", "status": "Active" },
+    { "name": "Neural Interface", "progress": "15%", "status": "Paused" },
+    { "name": "Brand Identity", "progress": "100%", "status": "Done" }
+  ],
+  "tasks": [
+    { "text": "Configurar el flujo de n8n", "done": true },
+    { "text": "Revisar logs de la base de datos", "done": true },
+    { "text": "Crear el repositorio del dashboard", "done": true },
+    { "text": "Disenar el sistema de notificaciones", "done": true }
+  ],
+  "notes": [
+    "El color de marca para el nuevo proyecto es #4F46E5.",
+    "Revisar la documentacion de la API de Telegram el viernes.",
+    "Idea: integrar el dashboard con un bot de voz.",
+    "Contacto soporte: support@example.com"
+  ],
+  "changes": [
+    {
+      "title": "Se agrego historico operativo base",
+      "meta": "OPERATIONS_HISTORY.json | comparativa diaria",
+      "impact": "Ahora el dashboard y la guia pueden comparar hoy contra ayer sin depender solo del snapshot actual."
+    },
+    {
+      "title": "Se formalizo el contexto del dashboard",
+      "meta": "DASHBOARD_CONTEXT.json | proyectos, tareas y notas",
+      "impact": "El panel ya puede crecer sobre datos estructurados y dejar Markdown como respaldo."
+    }
+  ]
+}
