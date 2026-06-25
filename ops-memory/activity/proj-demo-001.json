@@ -18,5 +18,10 @@
     "type": "connection_established",
     "source": "kimi",
     "summary": "Kimi Task Runner conectado al agente y listo para delegacion"
+  },
+  {
+    "type": "workflow_request",
+    "source": "kimi",
+    "summary": "Se solicitó el draft del workflow 'Telegram Alert Sync' para enviar alertas operativas desde n8n hacia Telegram"
   }
 ]
