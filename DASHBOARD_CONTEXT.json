@@ -35,13 +35,13 @@
       "done": true
     },
     {
-      "text": "Disenar el sistema de notificaciones",
+      "text": "Diseñar el sistema de notificaciones",
       "done": true
     }
   ],
   "notes": [
     "El color de marca para el nuevo proyecto es #4F46E5.",
-    "Revisar la documentacion de la API de Telegram el viernes.",
+    "Revisar la documentación de la API de Telegram el viernes.",
     "Idea: Integrar el Dashboard con un bot de voz.",
     "Contacto soporte: support@example.com"
   ],
