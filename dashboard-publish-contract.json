@@ -1,0 +1,32 @@
+{
+  "workflowId": "tZy2OwAQAXNo44m8",
+  "workflowName": "Dashboard GitHub",
+  "publishTargets": [
+    {
+      "path": "SYSTEM.json",
+      "required": true,
+      "purpose": "Fuente operativa principal"
+    },
+    {
+      "path": "OPERATIONS_HISTORY.json",
+      "required": true,
+      "purpose": "Comparativas diarias"
+    },
+    {
+      "path": "DASHBOARD_CONTEXT.json",
+      "required": true,
+      "purpose": "Contexto humano estructurado"
+    }
+  ],
+  "fallbackFiles": [
+    "PROJECTS.md",
+    "TASKS.md",
+    "NOTES.md"
+  ],
+  "notes": [
+    "El dashboard ya consume los tres publish targets.",
+    "Si DASHBOARD_CONTEXT.json falla, la UI cae a Markdown.",
+    "Si OPERATIONS_HISTORY.json falla, la UI mantiene el dashboard operativo pero sin comparativas.",
+    "Si SYSTEM.json falla, el dashboard pierde su fuente principal."
+  ]
+}

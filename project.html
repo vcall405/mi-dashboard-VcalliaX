@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VcalliaX Project Details</title>
+    <script>
+        (() => {
+            const saved = localStorage.getItem('theme');
+            document.documentElement.classList.toggle(
+                'dark',
+                saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)
+            );
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { letter-spacing: 0; transition: all .3s ease; }
+        body { font-family: 'Outfit', sans-serif; }
+        .surface { background: rgba(255,255,255,.86); border: 1px solid rgba(203,213,225,.7); backdrop-filter: blur(14px); }
+        .dark .surface { background: rgba(15,23,42,.78); border-color: rgba(51,65,85,.85); }
+        .status-dot::before { content: ''; width: .55rem; height: .55rem; border-radius: 9999px; display: inline-block; margin-right: .5rem; vertical-align: middle; }
+        .status-done::before { background: rgb(16 185 129); }
+        .status-progress::before { background: rgb(245 158 11); }
+        .status-pending::before { background: rgb(99 102 241); }
+        .status-blocked::before { background: rgb(244 63 94); }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+    <main class="mx-auto max-w-[1280px] px-4 py-5 md:px-8 md:py-8">
+        <header class="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5 dark:border-slate-800">
+            <div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <a href="index.html" class="inline-flex h-9 items-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:text-indigo-300">Volver al dashboard</a>
+                    <span class="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300">project guide</span>
+                </div>
+                <h1 class="mt-4 text-3xl font-extrabold text-slate-950 dark:text-white">VcalliaX Operations Project Details</h1>
+                <p class="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">Guia operativa del dashboard, sus contratos, su historico y el plan real para convertirlo en una consola confiable de monitoreo n8n.</p>
+            </div>
+            <button id="theme-toggle" type="button" class="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:border-indigo-400 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-amber-300" aria-label="Activar modo oscuro">
+                <svg class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"></path></svg>
+                <svg class="hidden h-5 w-5 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path stroke-linecap="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"></path></svg>
+            </button>
+        </header>
+
+        <section class="mb-6 grid gap-4 lg:grid-cols-3">
+            <article class="surface rounded-lg p-5">
+                <p class="text-xs font-semibold uppercase text-slate-500">Producto</p>
+                <h2 class="mt-2 text-xl font-bold">Dashboard operativo de n8n</h2>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Un panel para leer salud, actividad, comparativas, workflows y contexto del negocio desde un feed generado por automatizaciones.</p>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <p class="text-xs font-semibold uppercase text-slate-500">Fuente principal</p>
+                <h2 class="mt-2 text-xl font-bold" id="project-generated">SYSTEM.json</h2>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300" id="project-health">Sin datos cargados.</p>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <p class="text-xs font-semibold uppercase text-slate-500">Objetivo actual</p>
+                <h2 class="mt-2 text-xl font-bold">Consola confiable</h2>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Detectar incidentes, priorizar revisiones y mantener una referencia clara de estado del sistema con menos ambiguedad.</p>
+            </article>
+        </section>
+
+        <section class="mb-6 grid gap-4 md:grid-cols-4">
+            <article class="surface rounded-lg p-5"><p class="text-xs font-semibold uppercase text-slate-500">Alertas activas</p><p id="project-alerts" class="mt-2 text-3xl font-bold">--</p></article>
+            <article class="surface rounded-lg p-5"><p class="text-xs font-semibold uppercase text-slate-500">Ejecuciones hoy</p><p id="project-executions" class="mt-2 text-3xl font-bold">--</p></article>
+            <article class="surface rounded-lg p-5"><p class="text-xs font-semibold uppercase text-slate-500">Tasa de exito</p><p id="project-success" class="mt-2 text-3xl font-bold">--%</p></article>
+            <article class="surface rounded-lg p-5"><p class="text-xs font-semibold uppercase text-slate-500">Comparativa</p><p id="project-history" class="mt-2 text-3xl font-bold">--</p><p id="project-history-copy" class="mt-1 text-xs text-slate-500">Sin historico</p></article>
+        </section>
+
+        <section class="mb-6 surface rounded-lg p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold">Cobertura de automatizacion</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Estado real de lo que ya publica n8n y de lo que todavia falta automatizar en el workflow.</p>
+                </div>
+                <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">Parcialmente automatizado</span>
+            </div>
+            <div class="mt-5 grid gap-3 md:grid-cols-3">
+                <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/70 dark:bg-emerald-950/30">
+                    <p class="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">Activo</p>
+                    <p class="mt-2 font-bold text-slate-900 dark:text-white">SYSTEM.json</p>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Publicado por <code class="font-semibold">Dashboard GitHub</code> cada 30 minutos.</p>
+                </div>
+                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/70 dark:bg-amber-950/30">
+                    <p class="text-xs font-semibold uppercase text-amber-700 dark:text-amber-300">Pendiente en n8n</p>
+                    <p class="mt-2 font-bold text-slate-900 dark:text-white">OPERATIONS_HISTORY.json</p>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">La UI lo consume, pero el flow aun no lo publica automaticamente.</p>
+                </div>
+                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/70 dark:bg-amber-950/30">
+                    <p class="text-xs font-semibold uppercase text-amber-700 dark:text-amber-300">Pendiente en n8n</p>
+                    <p class="mt-2 font-bold text-slate-900 dark:text-white">DASHBOARD_CONTEXT.json</p>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">La UI ya tiene soporte y fallback, pero falta publicacion automatica desde n8n.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-6 grid gap-6 xl:grid-cols-[.95fr_1.05fr]">
+            <article class="surface rounded-lg p-5">
+                <h2 class="text-lg font-bold">Arquitectura</h2>
+                <div class="mt-4 space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                    <div><p class="font-semibold text-slate-900 dark:text-white">1. Presentacion</p><p>HTML estatico con Tailwind CDN. No hay backend propio ni bundler; la carga depende del navegador y del contenido servido por GitHub Pages.</p></div>
+                    <div><p class="font-semibold text-slate-900 dark:text-white">2. Feed operativo</p><p><code class="font-semibold">SYSTEM.json</code> concentra KPIs, ejecuciones recientes, workflows y actividad por hora.</p></div>
+                    <div><p class="font-semibold text-slate-900 dark:text-white">3. Historico</p><p><code class="font-semibold">OPERATIONS_HISTORY.json</code> agrega snapshots diarios para comparativas y lectura de tendencia.</p></div>
+                    <div><p class="font-semibold text-slate-900 dark:text-white">4. Contexto humano</p><p><code class="font-semibold">DASHBOARD_CONTEXT.json</code> formaliza proyectos, tareas y notas; Markdown queda como fallback.</p></div>
+                </div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <h2 class="text-lg font-bold">Fuentes de datos</h2>
+                <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-xs uppercase text-slate-500 dark:bg-slate-900">
+                            <tr><th class="px-4 py-3">Archivo</th><th class="px-4 py-3">Rol</th><th class="px-4 py-3">Uso</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                            <tr><td class="px-4 py-3 font-semibold">SYSTEM.json</td><td class="px-4 py-3">Feed principal</td><td class="px-4 py-3">KPIs, workflows, actividad, ejecuciones.</td></tr>
+                            <tr><td class="px-4 py-3 font-semibold">OPERATIONS_HISTORY.json</td><td class="px-4 py-3">Tendencia</td><td class="px-4 py-3">Comparativas hoy vs ayer y lectura de evolucion.</td></tr>
+                            <tr><td class="px-4 py-3 font-semibold">DASHBOARD_CONTEXT.json</td><td class="px-4 py-3">Contexto estructurado</td><td class="px-4 py-3">Proyectos, tareas, notas y cambios curados.</td></tr>
+                            <tr><td class="px-4 py-3 font-semibold">PROJECTS.md / TASKS.md / NOTES.md</td><td class="px-4 py-3">Fallback</td><td class="px-4 py-3">Respaldo humano si el JSON estructurado no existe.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section class="mb-6 grid gap-6 xl:grid-cols-[1.05fr_.95fr]">
+            <article class="surface rounded-lg p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Contrato de datos</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Reglas minimas para que el dashboard sea confiable y no se rompa con snapshots incompletos.</p>
+                    </div>
+                    <span id="contract-health" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Pendiente</span>
+                </div>
+                <div class="mt-5 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-xs uppercase text-slate-500 dark:bg-slate-900">
+                            <tr><th class="px-4 py-3">Campo</th><th class="px-4 py-3">Tipo</th><th class="px-4 py-3">Prioridad</th><th class="px-4 py-3">Fallback</th></tr>
+                        </thead>
+                        <tbody id="contract-table" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                    </table>
+                </div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Playbook operativo</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Que revisar primero cuando el panel empiece a dar senales dudosas.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Respuesta rapida</span>
+                </div>
+                <div id="playbook-list" class="mt-5 space-y-3"></div>
+            </article>
+        </section>
+
+        <section id="roadmap" class="surface rounded-lg p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold">Plan del proyecto</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Plan marcado, con estado visible, para que sepamos que falta y que ya esta resuelto.</p>
+                </div>
+                <span id="plan-summary" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">0/0 completado</span>
+            </div>
+            <div id="plan-list" class="mt-5 grid gap-4 lg:grid-cols-2"></div>
+        </section>
+
+        <section class="mt-6 grid gap-6 xl:grid-cols-2">
+            <article class="surface rounded-lg p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Ultimos cambios</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Bitacora visible para entender que se movio y con que impacto.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Trazabilidad</span>
+                </div>
+                <div id="changes-list" class="mt-5 space-y-3"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Proxima mejora recomendada</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Siguiente paso sugerido segun el estado actual del feed.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Decision</span>
+                </div>
+                <div id="next-step" class="mt-5 rounded-lg border border-slate-200 p-4 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300"></div>
+            </article>
+        </section>
+
+        <section class="mt-6 grid gap-6 lg:grid-cols-2">
+            <article class="surface rounded-lg p-5">
+                <h2 class="text-lg font-bold">Proyectos actuales</h2>
+                <div id="projects-list" class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <h2 class="text-lg font-bold">Notas operativas</h2>
+                <div id="notes-list" class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300"></div>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        const root = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        const dataContract = [
+            { field: 'generated_at', type: 'string ISO date', priority: 'critico', fallback: 'mostrar "sin timestamp"' },
+            { field: 'health', type: 'string', priority: 'critico', fallback: 'mostrar "unknown"' },
+            { field: 'executions_today', type: 'number', priority: 'critico', fallback: 'usar 0' },
+            { field: 'success_rate', type: 'number', priority: 'alto', fallback: 'usar 0%' },
+            { field: 'active_workflows', type: 'number', priority: 'alto', fallback: 'usar 0' },
+            { field: 'critical_alerts', type: 'number', priority: 'alto', fallback: 'usar 0' },
+            { field: 'recent_executions', type: 'array', priority: 'alto', fallback: 'mostrar lista vacia' },
+            { field: 'workflows', type: 'array', priority: 'critico', fallback: 'mostrar tabla vacia' },
+            { field: 'hourly_activity', type: 'array', priority: 'medio', fallback: 'mostrar grafica vacia' }
+        ];
+        const projectPlan = [
+            { title: 'Contrato fijo para SYSTEM.json', status: 'done', detail: 'Ya quedo definido en esta guia con campos obligatorios, tipos y fallback.' },
+            { title: 'Dashboard principal orientado a incidentes', status: 'done', detail: 'La vista principal ya sube incidentes, tendencias y decisiones rapidas.' },
+            { title: 'Bitacora visible de cambios', status: 'done', detail: 'La guia ya expone una seccion de ultimos cambios usando el feed actual.' },
+            { title: 'Playbook de respuesta operativa', status: 'done', detail: 'Se agrego un bloque que explica que revisar cuando falla el feed o baja la confianza.' },
+            { title: 'Comparativa hoy vs ayer', status: 'done', detail: 'Ahora existe un JSON historico base y la guia lo utiliza para comparar el desempeno.' },
+            { title: 'Migrar contexto humano a JSON estructurado', status: 'done', detail: 'El proyecto ya carga DASHBOARD_CONTEXT.json y deja Markdown como respaldo.' }
+        ];
+
+        function updateThemeButton() {
+            const dark = root.classList.contains('dark');
+            themeToggle.setAttribute('aria-label', dark ? 'Activar modo claro' : 'Activar modo oscuro');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const dark = root.classList.toggle('dark');
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
+            updateThemeButton();
+        });
+        updateThemeButton();
+
+        function renderContract(data = {}) {
+            const missing = dataContract.filter(item => data[item.field] === undefined);
+            document.getElementById('contract-health').textContent = missing.length ? `${missing.length} campos faltantes` : 'Contrato completo';
+            document.getElementById('contract-health').className = `rounded-full px-2.5 py-1 text-[11px] font-semibold ${missing.length ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'}`;
+            document.getElementById('contract-table').innerHTML = dataContract.map(item => {
+                const ok = data[item.field] !== undefined;
+                return `<tr>
+                    <td class="px-4 py-3 font-semibold">${item.field}</td>
+                    <td class="px-4 py-3">${item.type}</td>
+                    <td class="px-4 py-3 uppercase text-xs ${item.priority === 'critico' ? 'text-rose-600 dark:text-rose-400' : item.priority === 'alto' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}">${item.priority}</td>
+                    <td class="px-4 py-3"><div>${item.fallback}</div><div class="mt-1 text-xs ${ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${ok ? 'Disponible en el feed actual' : 'No encontrado en el feed actual'}</div></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderPlan() {
+            const done = projectPlan.filter(item => item.status === 'done').length;
+            document.getElementById('plan-summary').textContent = `${done}/${projectPlan.length} completado`;
+            document.getElementById('plan-list').innerHTML = projectPlan.map(item => {
+                const statusLabel = item.status === 'done' ? 'Hecho' : item.status === 'progress' ? 'En progreso' : item.status === 'blocked' ? 'Bloqueado' : 'Pendiente';
+                const statusClass = item.status === 'done' ? 'status-done border-emerald-200 dark:border-emerald-900' : item.status === 'progress' ? 'status-progress border-amber-200 dark:border-amber-900' : item.status === 'blocked' ? 'status-blocked border-rose-200 dark:border-rose-900' : 'status-pending border-indigo-200 dark:border-indigo-900';
+                return `<div class="rounded-lg border p-4 ${statusClass}"><div class="flex items-center justify-between gap-3"><p class="status-dot font-semibold text-slate-900 dark:text-white">${item.title}</p><span class="text-xs font-semibold uppercase text-slate-500">${statusLabel}</span></div><p class="mt-2 text-sm text-slate-600 dark:text-slate-300">${item.detail}</p></div>`;
+            }).join('');
+        }
+
+        function renderPlaybook(data = {}) {
+            const alerts = Number(data.critical_alerts ?? 0);
+            const recent = Array.isArray(data.recent_executions) ? data.recent_executions : [];
+            const stale = Array.isArray(data.workflows) ? data.workflows.filter(item => !item.last_started_at).length : 0;
+            const playbook = [
+                { title: 'Si SYSTEM.json no carga', body: 'Revisar el workflow Dashboard GitHub, validar la ultima ejecucion y confirmar que GitHub Pages publique el JSON actualizado.' },
+                { title: 'Si no hay ejecuciones recientes', body: recent.length ? `El feed aun muestra ${recent.length} ejecuciones. Si la UI queda vacia, revisar parseo o cache del navegador.` : 'Validar si n8n realmente esta produciendo actividad o si el workflow que publica el feed fallo.' },
+                { title: 'Si suben las alertas criticas', body: alerts ? `Ahora mismo hay ${alerts} alerta(s) criticas. La prioridad es revisar el flujo con error antes de confiar en el resto del panel.` : 'No hay alertas activas; enfocate en prevenir staleness y mejorar historico.' },
+                { title: 'Si un workflow aparece sin pulso', body: stale ? `Hay ${stale} workflow(s) sin ultima actividad. Confirmar si estan inactivos a proposito, mal instrumentados o ya no son relevantes.` : 'Todos los workflows reportan alguna huella reciente o estado conocido.' }
+            ];
+            document.getElementById('playbook-list').innerHTML = playbook.map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><p class="font-semibold text-slate-900 dark:text-white">${item.title}</p><p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${item.body}</p></div>`).join('');
+        }
+
+        function renderChanges(data = {}, context = {}) {
+            const recent = (data.recent_executions || []).slice(0, 4).map(item => ({
+                title: item.workflow_name,
+                meta: `${item.status} | ${item.mode} | ${new Date(item.started_at).toLocaleString('es-PR')}`,
+                impact: item.status === 'error' ? 'Impacto: revisar este flujo antes de usar el dashboard como referencia final.' : 'Impacto: el flujo deja trazabilidad reciente.'
+            }));
+            const curated = (context.changes || []).slice(0, 2);
+            const changes = [...recent, ...curated];
+            document.getElementById('changes-list').innerHTML = changes.map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><p class="font-semibold text-slate-900 dark:text-white">${item.title}</p><p class="mt-1 text-xs text-slate-500">${item.meta || ''}</p><p class="mt-2 text-sm text-slate-600 dark:text-slate-300">${item.impact || item.text || ''}</p></div>`).join('');
+        }
+
+        function renderNextStep(data = {}) {
+            const alerts = Number(data.critical_alerts ?? 0);
+            const stale = Array.isArray(data.workflows) ? data.workflows.filter(item => !item.last_started_at).length : 0;
+            const success = Number(data.success_rate ?? 0);
+            let message = 'Siguiente paso: automatizar la captura diaria del historico para que OPERATIONS_HISTORY.json no sea manual.';
+            if (alerts > 0) message = 'Siguiente paso: corregir primero el workflow con errores de hoy y volver a publicar SYSTEM.json antes de seguir ampliando el dashboard.';
+            else if (stale > 3) message = 'Siguiente paso: revisar workflows sin pulso para separar los que estan inactivos a proposito de los que realmente estan mal instrumentados.';
+            else if (success < 95) message = 'Siguiente paso: subir la tasa de exito y luego profundizar comparativas historicas.';
+            document.getElementById('next-step').textContent = message;
+        }
+
+        async function loadProjectSummary() {
+            try {
+                const [systemResponse, historyResponse] = await Promise.all([
+                    fetch(`SYSTEM.json?v=${Date.now()}`, { cache: 'no-store' }),
+                    fetch(`OPERATIONS_HISTORY.json?v=${Date.now()}`, { cache: 'no-store' })
+                ]);
+                if (!systemResponse.ok) throw new Error(`HTTP ${systemResponse.status}`);
+                const data = await systemResponse.json();
+                document.getElementById('project-generated').textContent = `SYSTEM.json | ${data.generated_at ? new Date(data.generated_at).toLocaleString('es-PR') : 'sin timestamp'}`;
+                document.getElementById('project-health').textContent = `Health: ${data.health || 'unknown'} | ${data.active_workflows ?? 0} workflows activos | ${data.executions_today ?? 0} ejecuciones hoy.`;
+                document.getElementById('project-alerts').textContent = String(data.critical_alerts ?? 0);
+                document.getElementById('project-executions').textContent = String(data.executions_today ?? 0);
+                document.getElementById('project-success').textContent = `${data.success_rate ?? 0}%`;
+                renderContract(data);
+                renderPlaybook(data);
+                renderNextStep(data);
+                if (historyResponse.ok) {
+                    const history = await historyResponse.json();
+                    const latest = history.snapshots?.[0];
+                    const previous = history.snapshots?.[1];
+                    if (latest && previous) {
+                        const delta = (latest.executions_today ?? 0) - (previous.executions_today ?? 0);
+                        document.getElementById('project-history').textContent = `${delta >= 0 ? '+' : ''}${delta}`;
+                        document.getElementById('project-history-copy').textContent = `Hoy ${latest.executions_today ?? 0} vs ayer ${previous.executions_today ?? 0}`;
+                    }
+                }
+                return data;
+            } catch (error) {
+                document.getElementById('project-health').textContent = 'No se pudo cargar el resumen operativo.';
+                console.error('Error cargando resumen del proyecto', error);
+                return null;
+            }
+        }
+
+        async function loadProjectContext(data) {
+            let context = null;
+            try {
+                const response = await fetch(`DASHBOARD_CONTEXT.json?v=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                context = await response.json();
+                document.getElementById('projects-list').innerHTML = (context.projects || []).map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><span class="font-semibold text-slate-900 dark:text-white">${item.name}</span><div class="mt-1 text-xs text-slate-500">${item.progress || '0%'} | ${item.status || 'Sin estado'}</div></div>`).join('');
+                document.getElementById('notes-list').innerHTML = (context.notes || []).map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700">${item}</div>`).join('');
+            } catch (error) {
+                console.warn('Fallback a Markdown para contexto del proyecto', error);
+            }
+
+            if (!context) {
+                const request = name => fetch(`${name}?v=${Date.now()}`, { cache: 'no-store' }).then(response => response.text());
+                const [projects, notes] = await Promise.all([request('PROJECTS.md'), request('NOTES.md')]);
+                document.getElementById('projects-list').innerHTML = projects.split('\n').filter(line => line.trim().startsWith('-')).map(line => {
+                    const clean = line.replace(/^- /, '');
+                    const [name, progress, status] = clean.split('|').map(value => value.trim());
+                    return `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><span class="font-semibold text-slate-900 dark:text-white">${name}</span><div class="mt-1 text-xs text-slate-500">${progress || '0%'} | ${status || 'Sin estado'}</div></div>`;
+                }).join('');
+                document.getElementById('notes-list').innerHTML = notes.split('\n').filter(line => line.trim().startsWith('-')).map(line => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700">${line.replace(/^- /, '')}</div>`).join('');
+            }
+
+            renderChanges(data || {}, context || {});
+        }
+
+        renderPlan();
+        loadProjectSummary().then(loadProjectContext);
+    </script>
+</body>
+</html>

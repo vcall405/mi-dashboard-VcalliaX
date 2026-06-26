@@ -7,32 +7,46 @@
     <script>
         (() => {
             const saved = localStorage.getItem('theme');
-            document.documentElement.classList.toggle('dark', saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches));
+            document.documentElement.classList.toggle(
+                'dark',
+                saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)
+            );
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' };</script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { letter-spacing: 0; }
+        * { letter-spacing: 0; transition: all .3s ease; }
         body { font-family: 'Outfit', sans-serif; }
-        .surface { background: rgba(255,255,255,.86); border: 1px solid rgba(203,213,225,.7); backdrop-filter: blur(12px); }
-        .dark .surface { background: rgba(15,23,42,.78); border-color: rgba(51,65,85,.8); }
+        .surface { background: rgba(255,255,255,.86); border: 1px solid rgba(203,213,225,.7); backdrop-filter: blur(14px); }
+        .dark .surface { background: rgba(15,23,42,.78); border-color: rgba(51,65,85,.85); }
+        .surface-soft { background: rgba(248,250,252,.85); border: 1px solid rgba(226,232,240,.8); }
+        .dark .surface-soft { background: rgba(15,23,42,.55); border-color: rgba(51,65,85,.75); }
         .pulse-bar { transform-origin: bottom; animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
-        @keyframes rise { from { transform: scaleY(.05); opacity: .25; } }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+        @keyframes rise { from { transform: scaleY(.05); opacity: .2; } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-    <main class="mx-auto max-w-[1500px] px-4 py-5 md:px-8 md:py-8">
-        <header class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5 dark:border-slate-800">
-            <div class="flex items-center gap-4">
-                <div class="grid h-11 w-11 place-items-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+<body class="min-h-screen bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+    <main class="mx-auto max-w-[1520px] px-4 py-5 md:px-8 md:py-8">
+        <header class="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5 dark:border-slate-800">
+            <div class="flex items-start gap-4">
+                <div class="grid h-12 w-12 place-items-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/25">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 17l4-5 4 3 5-8 3 4M4 21h16"></path></svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-950 dark:text-white">VcalliaX Operations</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Monitoreo operativo de n8n</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-2xl font-extrabold text-slate-950 dark:text-white">VcalliaX Operations</h1>
+                        <span class="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300">n8n control room</span>
+                    </div>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Monitoreo operativo, comparativas y contexto estructurado del sistema VcalliaX.</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <a href="project.html" class="inline-flex h-9 items-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:text-indigo-300">Ver proyecto</a>
+                        <a href="https://n8n2.vcallia.com/home/workflows" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 items-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:text-indigo-300">Abrir n8n</a>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -47,34 +61,200 @@
             </div>
         </header>
 
-        <section class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Ejecuciones hoy</p><p id="kpi-executions" class="mt-2 text-3xl font-bold">--</p><p id="kpi-successful" class="mt-1 text-xs text-slate-500"></p></article>
-            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Tasa de éxito</p><p id="kpi-success-rate" class="mt-2 text-3xl font-bold">--%</p><div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="success-progress" class="h-full rounded-full bg-emerald-500 transition-all duration-700" style="width:0%"></div></div></article>
-            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Workflows activos</p><p id="kpi-workflows" class="mt-2 text-3xl font-bold">--</p><p class="mt-1 text-xs text-slate-500">publicados en n8n</p></article>
-            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Errores hoy</p><p id="kpi-alerts" class="mt-2 text-3xl font-bold text-rose-600 dark:text-rose-400">--</p><p class="mt-1 text-xs text-slate-500">Telegram vigila los nuevos</p></article>
-            <article class="surface col-span-2 rounded-lg p-4 lg:col-span-1"><p class="text-xs font-semibold uppercase text-slate-500">Última sincronización</p><p id="kpi-time" class="mt-2 text-3xl font-bold">--:--</p><p id="refresh-status" class="mt-1 text-xs text-slate-500">Actualiza en 60s</p></article>
+        <section class="mb-6 grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+            <article class="surface overflow-hidden rounded-lg">
+                <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+                    <p class="text-xs font-semibold uppercase text-slate-500">Atencion operativa</p>
+                    <h2 class="mt-1 text-lg font-bold">Incidentes y acciones sugeridas</h2>
+                </div>
+                <div class="grid gap-3 p-5 md:grid-cols-2">
+                    <div id="incident-summary" class="surface-soft rounded-lg p-4"></div>
+                    <div id="incident-actions" class="surface-soft rounded-lg p-4"></div>
+                </div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold uppercase text-slate-500">Feed de datos</p>
+                        <h2 class="mt-1 text-lg font-bold">Estado de sincronizacion</h2>
+                    </div>
+                    <span id="date-display" class="text-xs font-semibold text-slate-500"></span>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                    <div class="surface-soft rounded-lg p-4">
+                        <p class="text-xs font-semibold uppercase text-slate-500">Ultima sincronizacion</p>
+                        <p id="kpi-time" class="mt-2 text-3xl font-bold">--:--</p>
+                        <p id="refresh-status" class="mt-1 text-xs text-slate-500">Actualiza en 60s</p>
+                    </div>
+                    <div class="surface-soft rounded-lg p-4">
+                        <p class="text-xs font-semibold uppercase text-slate-500">Fuente principal</p>
+                        <p class="mt-2 text-lg font-bold">SYSTEM.json</p>
+                        <p id="generated-at" class="mt-1 text-xs text-slate-500">Sin timestamp</p>
+                    </div>
+                </div>
+                <div class="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                    Este panel usa <code class="font-semibold">SYSTEM.json</code>, <code class="font-semibold">OPERATIONS_HISTORY.json</code> y <code class="font-semibold">DASHBOARD_CONTEXT.json</code>, con fallback a <code class="font-semibold">PROJECTS.md</code>, <code class="font-semibold">TASKS.md</code> y <code class="font-semibold">NOTES.md</code>.
+                </div>
+                <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-200">
+                    <p class="font-semibold">Cobertura actual del flow</p>
+                    <p class="mt-1">El workflow <code class="font-semibold">Dashboard GitHub</code> automatiza <code class="font-semibold">SYSTEM.json</code>. El historico y el contexto estructurado ya existen en la UI, pero todavia requieren publicacion dedicada desde n8n para quedar 100% automaticos.</p>
+                </div>
+            </article>
         </section>
 
-        <section class="mb-6 grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+        <section class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Ejecuciones hoy</p><p id="kpi-executions" class="mt-2 text-3xl font-bold">--</p><p id="kpi-successful" class="mt-1 text-xs text-slate-500"></p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Tasa de exito</p><p id="kpi-success-rate" class="mt-2 text-3xl font-bold">--%</p><div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"><div id="success-progress" class="h-full rounded-full bg-emerald-500" style="width:0%"></div></div></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Workflows activos</p><p id="kpi-workflows" class="mt-2 text-3xl font-bold">--</p><p class="mt-1 text-xs text-slate-500">publicados en n8n</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Errores hoy</p><p id="kpi-alerts" class="mt-2 text-3xl font-bold text-rose-600 dark:text-rose-400">--</p><p class="mt-1 text-xs text-slate-500">impacto operativo inmediato</p></article>
+            <article class="surface col-span-2 rounded-lg p-4 lg:col-span-1"><p class="text-xs font-semibold uppercase text-slate-500">Health global</p><p id="kpi-health" class="mt-2 text-3xl font-bold">--</p><p id="kpi-health-copy" class="mt-1 text-xs text-slate-500">Estado del sistema</p></article>
+        </section>
+
+        <section class="mb-6 grid gap-4 md:grid-cols-3">
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Workflows con error</p><p id="trend-risky-count" class="mt-2 text-2xl font-bold">--</p><p id="trend-risky-copy" class="mt-1 text-xs text-slate-500">Sin calcular</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Ventana reciente</p><p id="trend-latest-window" class="mt-2 text-2xl font-bold">--</p><p id="trend-latest-copy" class="mt-1 text-xs text-slate-500">Sin calcular</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Workflows sin pulso</p><p id="trend-stale-count" class="mt-2 text-2xl font-bold">--</p><p id="trend-stale-copy" class="mt-1 text-xs text-slate-500">Sin calcular</p></article>
+        </section>
+
+        <section class="mb-6 grid gap-4 lg:grid-cols-3">
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Vs ayer ejecuciones</p><p id="history-executions" class="mt-2 text-2xl font-bold">--</p><p id="history-executions-copy" class="mt-1 text-xs text-slate-500">Sin historico</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Vs ayer exito</p><p id="history-success" class="mt-2 text-2xl font-bold">--</p><p id="history-success-copy" class="mt-1 text-xs text-slate-500">Sin historico</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Vs ayer alertas</p><p id="history-alerts" class="mt-2 text-2xl font-bold">--</p><p id="history-alerts-copy" class="mt-1 text-xs text-slate-500">Sin historico</p></article>
+        </section>
+
+        <section class="mb-6 grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Estado de fuentes</h2>
+                        <p class="text-xs text-slate-500">Muestra si el panel esta leyendo JSON estructurado o usando fallback.</p>
+                    </div>
+                    <span id="sources-summary" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Pendiente</span>
+                </div>
+                <div id="sources-status" class="grid gap-3 md:grid-cols-3"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Historico operativo</h2>
+                        <p class="text-xs text-slate-500">Lectura visual simple de los ultimos snapshots diarios.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">3 dias</span>
+                </div>
+                <div id="history-bars" class="grid gap-3"></div>
+            </article>
+        </section>
+
+        <section class="mb-6 grid gap-4 xl:grid-cols-[1.1fr_.9fr]">
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Resumen ejecutivo</h2>
+                        <p class="text-xs text-slate-500">Lectura rapida del volumen, riesgo y prioridad operativa.</p>
+                    </div>
+                    <span id="executive-timestamp" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Sin datos</span>
+                </div>
+                <div id="executive-summary" class="grid gap-3 md:grid-cols-3"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Cambios y contexto</h2>
+                        <p class="text-xs text-slate-500">Combina cambios curados del proyecto con la actividad mas reciente.</p>
+                    </div>
+                    <span id="changes-count" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">0 items</span>
+                </div>
+                <div id="changes-container" class="grid gap-3"></div>
+            </article>
+        </section>
+
+        <section class="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Proyectos</p><p id="context-project-count" class="mt-2 text-2xl font-bold">--</p><p id="context-project-copy" class="mt-1 text-xs text-slate-500">Sin contexto</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Tareas abiertas</p><p id="context-task-open-count" class="mt-2 text-2xl font-bold">--</p><p id="context-task-open-copy" class="mt-1 text-xs text-slate-500">Sin contexto</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Notas activas</p><p id="context-note-count" class="mt-2 text-2xl font-bold">--</p><p id="context-note-copy" class="mt-1 text-xs text-slate-500">Sin contexto</p></article>
+            <article class="surface rounded-lg p-4"><p class="text-xs font-semibold uppercase text-slate-500">Cambios curados</p><p id="context-change-count" class="mt-2 text-2xl font-bold">--</p><p id="context-change-copy" class="mt-1 text-xs text-slate-500">Sin contexto</p></article>
+        </section>
+
+        <section class="mb-6 grid gap-6 xl:grid-cols-[1.05fr_.95fr]">
             <article class="surface min-w-0 rounded-lg p-5">
-                <div class="mb-5 flex items-center justify-between"><div><h2 class="text-lg font-bold">Pulso de ejecuciones</h2><p class="text-xs text-slate-500">Actividad por hora · verde correcto · rojo error</p></div><span id="date-display" class="text-xs font-semibold text-slate-500"></span></div>
+                <div class="mb-5 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Pulso de ejecuciones</h2>
+                        <p class="text-xs text-slate-500">Actividad por hora, verde correcto y rojo error.</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">24 horas</span>
+                </div>
                 <div id="activity-chart" class="flex h-48 items-end gap-1 border-b border-slate-200 pb-6 dark:border-slate-700"></div>
             </article>
             <article class="surface min-w-0 rounded-lg p-5">
-                <div class="mb-4 flex items-center justify-between"><div><h2 class="text-lg font-bold">Actividad reciente</h2><p class="text-xs text-slate-500">Últimas 12 ejecuciones registradas</p></div><a href="https://n8n2.vcallia.com/home/workflows" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir n8n</a></div>
+                <div class="mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold">Actividad reciente</h2>
+                        <p class="text-xs text-slate-500">Ultimas 12 ejecuciones registradas</p>
+                    </div>
+                    <a href="https://n8n2.vcallia.com/home/workflows" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir n8n</a>
+                </div>
                 <div id="executions-list" class="max-h-80 space-y-1 overflow-auto pr-1"></div>
             </article>
         </section>
 
         <section class="surface mb-6 overflow-hidden rounded-lg">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5 dark:border-slate-700"><div><h2 class="text-lg font-bold">Salud por workflow</h2><p class="text-xs text-slate-500">Errores primero, luego volumen de actividad</p></div><input id="workflow-search" type="search" placeholder="Buscar workflow" class="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 sm:w-64"></div>
-            <div class="overflow-x-auto"><table class="w-full min-w-[760px] text-left text-sm"><thead class="bg-slate-100/80 text-xs uppercase text-slate-500 dark:bg-slate-900/80"><tr><th class="px-5 py-3">Workflow</th><th class="px-5 py-3">Estado</th><th class="px-5 py-3">Ejecuciones</th><th class="px-5 py-3">Errores</th><th class="px-5 py-3">Éxito</th><th class="px-5 py-3">Última actividad</th><th class="px-5 py-3"></th></tr></thead><tbody id="workflows-table" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody></table></div>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5 dark:border-slate-700">
+                <div>
+                    <h2 class="text-lg font-bold">Salud por workflow</h2>
+                    <p class="text-xs text-slate-500">Errores primero, luego volumen, exito y ultima actividad.</p>
+                </div>
+                <input id="workflow-search" type="search" placeholder="Buscar workflow" class="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 sm:w-64">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[760px] text-left text-sm">
+                    <thead class="bg-slate-100/80 text-xs uppercase text-slate-500 dark:bg-slate-900/80">
+                        <tr>
+                            <th class="px-5 py-3">Workflow</th>
+                            <th class="px-5 py-3">Estado</th>
+                            <th class="px-5 py-3">Ejecuciones</th>
+                            <th class="px-5 py-3">Errores</th>
+                            <th class="px-5 py-3">Exito</th>
+                            <th class="px-5 py-3">Ultima actividad</th>
+                            <th class="px-5 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="workflows-table" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                </table>
+            </div>
         </section>
 
-        <section class="grid gap-6 lg:grid-cols-3">
-            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Proyectos</h2><div id="projects-container" class="space-y-4"></div></article>
-            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Tareas</h2><div id="tasks-container" class="space-y-2"></div></article>
-            <article class="surface rounded-lg p-5"><h2 class="mb-4 text-base font-bold">Notas</h2><div id="notes-container" class="space-y-2"></div></article>
+        <section class="grid gap-6 lg:grid-cols-[1fr_1fr_1.1fr]">
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold">Proyectos</h2>
+                        <p class="text-xs text-slate-500">Radar rapido del estado interno</p>
+                    </div>
+                    <a href="project.html#roadmap" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Roadmap</a>
+                </div>
+                <div id="projects-container" class="space-y-4"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold">Tareas</h2>
+                        <p class="text-xs text-slate-500">Pendientes y completadas</p>
+                    </div>
+                    <a href="project.html#operations" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Como opera</a>
+                </div>
+                <div id="tasks-container" class="space-y-2"></div>
+            </article>
+            <article class="surface rounded-lg p-5">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold">Notas</h2>
+                        <p class="text-xs text-slate-500">Contexto y recordatorios</p>
+                    </div>
+                    <a href="project.html#sources" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Fuentes</a>
+                </div>
+                <div id="notes-container" class="space-y-2"></div>
+            </article>
         </section>
     </main>
 
@@ -84,27 +264,56 @@
         const refreshButton = document.getElementById('refresh-button');
         let dashboardData = null;
         let refreshCountdown = 60;
+        let sourceState = {
+            system: false,
+            history: false,
+            context: false,
+            markdownFallback: false
+        };
 
-        const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-        const statusMeta = status => ({ success:['Correcto','bg-emerald-500','text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/40'], error:['Error','bg-rose-500','text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'], crashed:['Caído','bg-rose-500','text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'], waiting:['En espera','bg-amber-500','text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40'], running:['Ejecutando','bg-sky-500','text-sky-700 bg-sky-50 dark:text-sky-300 dark:bg-sky-950/40']}[status] || ['Sin datos','bg-slate-400','text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-slate-800']);
-        const formatTime = date => date ? new Intl.DateTimeFormat('es-ES',{hour:'2-digit',minute:'2-digit'}).format(new Date(date)) : 'Sin datos';
-        const formatDuration = ms => ms == null ? '—' : ms < 1000 ? `${ms} ms` : `${(ms/1000).toFixed(ms < 10000 ? 1 : 0)} s`;
+        const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+        const statusMeta = status => ({
+            success: ['Correcto', 'bg-emerald-500', 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/40'],
+            error: ['Error', 'bg-rose-500', 'text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'],
+            crashed: ['Caido', 'bg-rose-500', 'text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/40'],
+            waiting: ['En espera', 'bg-amber-500', 'text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40'],
+            running: ['Ejecutando', 'bg-sky-500', 'text-sky-700 bg-sky-50 dark:text-sky-300 dark:bg-sky-950/40'],
+            unknown: ['Sin datos', 'bg-slate-400', 'text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-slate-800']
+        }[status] || ['Sin datos', 'bg-slate-400', 'text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-slate-800']);
+        const healthMeta = value => ({
+            healthy: ['Estable', 'Operacion estable y sin riesgos inmediatos.'],
+            degraded: ['Degradado', 'Hay alertas o errores menores que requieren seguimiento.'],
+            critical: ['Critico', 'Hay incidentes activos o salud operativa comprometida.']
+        }[value] || ['Desconocido', 'No hay suficientes datos para determinar la salud.']);
+        const formatTime = date => date ? new Intl.DateTimeFormat('es-PR', { hour: '2-digit', minute: '2-digit' }).format(new Date(date)) : 'Sin datos';
+        const formatDateTime = date => date ? new Intl.DateTimeFormat('es-PR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(date)) : 'Sin timestamp';
+        const formatDuration = ms => ms == null ? '-' : ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)} s`;
 
         function updateThemeButton() {
             const dark = root.classList.contains('dark');
             themeToggle.setAttribute('aria-label', dark ? 'Activar modo claro' : 'Activar modo oscuro');
         }
-        themeToggle.addEventListener('click', () => { const dark = root.classList.toggle('dark'); localStorage.setItem('theme', dark ? 'dark' : 'light'); updateThemeButton(); });
+
+        themeToggle.addEventListener('click', () => {
+            const dark = root.classList.toggle('dark');
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
+            updateThemeButton();
+        });
         updateThemeButton();
 
         function renderHealth(data) {
-            const states = { healthy:['Operación estable','bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-300','bg-emerald-500'], degraded:['Atención requerida','bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-300','bg-amber-500'], critical:['Estado crítico','bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900 dark:text-rose-300','bg-rose-500']};
+            const states = {
+                healthy: ['Operacion estable', 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-300', 'bg-emerald-500'],
+                degraded: ['Atencion requerida', 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-300', 'bg-amber-500'],
+                critical: ['Estado critico', 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900 dark:text-rose-300', 'bg-rose-500']
+            };
             const [label, classes, dot] = states[data.health] || states.degraded;
             document.getElementById('health-badge').className = `flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-semibold ${classes}`;
             document.getElementById('health-badge').innerHTML = `<span class="h-2 w-2 rounded-full ${dot}"></span>${label}`;
         }
 
         function renderMetrics(data) {
+            const [healthLabel, healthCopy] = healthMeta(data.health);
             document.getElementById('kpi-executions').textContent = data.executions_today ?? 0;
             document.getElementById('kpi-successful').textContent = `${data.successful_today ?? 0} completadas correctamente`;
             document.getElementById('kpi-success-rate').textContent = `${data.success_rate ?? 0}%`;
@@ -112,66 +321,412 @@
             document.getElementById('kpi-workflows').textContent = data.active_workflows ?? 0;
             document.getElementById('kpi-alerts').textContent = data.critical_alerts ?? 0;
             document.getElementById('kpi-time').textContent = data.last_execution || '--:--';
+            document.getElementById('kpi-health').textContent = healthLabel;
+            document.getElementById('kpi-health-copy').textContent = healthCopy;
+            document.getElementById('generated-at').textContent = `Generado: ${formatDateTime(data.generated_at)}`;
             renderHealth(data);
+        }
+
+        function renderIncidents(data) {
+            const workflows = [...(data.workflows || [])].sort((a, b) => {
+                if ((b.errors_today || 0) !== (a.errors_today || 0)) return (b.errors_today || 0) - (a.errors_today || 0);
+                return (b.executions_today || 0) - (a.executions_today || 0);
+            });
+            const risky = workflows.filter(item => item.errors_today > 0).slice(0, 3);
+            const stale = workflows.filter(item => !item.last_started_at).slice(0, 2);
+
+            document.getElementById('incident-summary').innerHTML = `
+                <p class="text-xs font-semibold uppercase text-slate-500">Resumen rapido</p>
+                <div class="mt-3 space-y-3">
+                    <div class="flex items-end justify-between gap-3">
+                        <div>
+                            <p class="text-3xl font-bold text-slate-950 dark:text-white">${data.critical_alerts ?? 0}</p>
+                            <p class="text-sm text-slate-500">alertas activas</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-bold ${data.success_rate >= 95 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}">${data.success_rate ?? 0}%</p>
+                            <p class="text-xs text-slate-500">exito del dia</p>
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 px-3 py-3 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                        ${data.critical_alerts > 0
+                            ? 'Hay al menos un flujo que necesita revision antes de confiar en el panel como estado final del sistema.'
+                            : 'No hay alertas criticas nuevas. El foco ahora es mantener trazabilidad y detectar degradacion temprana.'}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('incident-actions').innerHTML = `
+                <p class="text-xs font-semibold uppercase text-slate-500">Acciones sugeridas</p>
+                <ul class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                    ${risky.length
+                        ? risky.map(item => `<li class="rounded-lg border border-rose-200 px-3 py-2 dark:border-rose-900">Revisar <span class="font-semibold">${escapeHtml(item.name)}</span> porque reporta <span class="font-semibold">${item.errors_today}</span> error(es) hoy.</li>`).join('')
+                        : '<li class="rounded-lg border border-emerald-200 px-3 py-2 dark:border-emerald-900">No hay workflows con errores hoy. Prioridad en trazabilidad y frescura del feed.</li>'}
+                    ${stale.length
+                        ? `<li class="rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-700">Validar workflows sin actividad reciente: ${stale.map(item => `<span class="font-semibold">${escapeHtml(item.name)}</span>`).join(', ')}.</li>`
+                        : ''}
+                </ul>
+            `;
+        }
+
+        function renderTrends(data) {
+            const workflows = data.workflows || [];
+            const risky = workflows.filter(item => (item.errors_today || 0) > 0);
+            const stale = workflows.filter(item => !item.last_started_at);
+            const recent = (data.recent_executions || []).slice(0, 5);
+            const recentErrors = recent.filter(item => item.status === 'error' || item.status === 'crashed').length;
+
+            document.getElementById('trend-risky-count').textContent = String(risky.length);
+            document.getElementById('trend-risky-copy').textContent = risky.length ? `${risky[0].name} lidera la revision.` : 'No hay workflows con errores hoy.';
+            document.getElementById('trend-latest-window').textContent = `${recent.length}/${recentErrors}`;
+            document.getElementById('trend-latest-copy').textContent = `${recent.length} ejecuciones vistas, ${recentErrors} con fallo.`;
+            document.getElementById('trend-stale-count').textContent = String(stale.length);
+            document.getElementById('trend-stale-copy').textContent = stale.length ? 'Conviene validar si siguen vigentes o desconectados.' : 'Todos los workflows muestran ultima actividad.';
+        }
+
+        function renderHistory(history = {}) {
+            const latest = history.snapshots?.[0];
+            const previous = history.snapshots?.[1];
+            if (!latest || !previous) return;
+
+            const execDelta = (latest.executions_today ?? 0) - (previous.executions_today ?? 0);
+            const successDelta = (latest.success_rate ?? 0) - (previous.success_rate ?? 0);
+            const alertDelta = (latest.critical_alerts ?? 0) - (previous.critical_alerts ?? 0);
+
+            document.getElementById('history-executions').textContent = `${execDelta >= 0 ? '+' : ''}${execDelta}`;
+            document.getElementById('history-executions-copy').textContent = `Hoy ${latest.executions_today ?? 0} vs ayer ${previous.executions_today ?? 0}`;
+            document.getElementById('history-success').textContent = `${successDelta >= 0 ? '+' : ''}${successDelta}%`;
+            document.getElementById('history-success-copy').textContent = `Hoy ${latest.success_rate ?? 0}% vs ayer ${previous.success_rate ?? 0}%`;
+            document.getElementById('history-alerts').textContent = `${alertDelta >= 0 ? '+' : ''}${alertDelta}`;
+            document.getElementById('history-alerts-copy').textContent = `Hoy ${latest.critical_alerts ?? 0} vs ayer ${previous.critical_alerts ?? 0}`;
+
+            const maxExecutions = Math.max(...history.snapshots.map(item => item.executions_today || 0), 1);
+            document.getElementById('history-bars').innerHTML = history.snapshots.map(item => {
+                const width = ((item.executions_today || 0) / maxExecutions) * 100;
+                return `
+                    <div class="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                        <div class="mb-2 flex items-center justify-between text-xs text-slate-500">
+                            <span>${item.date}</span>
+                            <span>${item.executions_today || 0} ejecuciones</span>
+                        </div>
+                        <div class="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <div class="h-full rounded-full bg-indigo-500" style="width:${width}%"></div>
+                        </div>
+                        <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+                            <span>${item.success_rate || 0}% exito</span>
+                            <span>${item.critical_alerts || 0} alertas</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderSources() {
+            const items = [
+                {
+                    label: 'SYSTEM.json',
+                    ok: sourceState.system,
+                    copy: sourceState.system ? 'Feed operativo principal cargado.' : 'No disponible.'
+                },
+                {
+                    label: 'OPERATIONS_HISTORY.json',
+                    ok: sourceState.history,
+                    copy: sourceState.history ? 'Comparativas historicas activas.' : 'Sin historico cargado.'
+                },
+                {
+                    label: 'DASHBOARD_CONTEXT.json',
+                    ok: sourceState.context,
+                    copy: sourceState.context
+                        ? 'Contexto estructurado activo.'
+                        : sourceState.markdownFallback
+                            ? 'Usando fallback Markdown.'
+                            : 'Contexto no disponible.'
+                }
+            ];
+            const healthySources = items.filter(item => item.ok).length;
+            document.getElementById('sources-summary').textContent = `${healthySources}/${items.length} fuentes activas`;
+            document.getElementById('sources-status').innerHTML = items.map(item => `
+                <div class="surface-soft rounded-lg p-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white">${item.label}</p>
+                        <span class="inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${item.ok ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}">${item.ok ? 'Activo' : 'Fallback'}</span>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500">${item.copy}</p>
+                </div>
+            `).join('');
         }
 
         function renderActivity(items = []) {
             const max = Math.max(1, ...items.map(item => item.total));
             document.getElementById('activity-chart').innerHTML = items.map((item, index) => {
-                const success = Math.max(0, item.total - item.errors);
                 const totalHeight = Math.max(item.total ? 12 : 2, (item.total / max) * 100);
                 const errorHeight = item.total ? (item.errors / item.total) * totalHeight : 0;
+                const successHeight = item.total ? Math.max(0, totalHeight - errorHeight) : 0;
                 const showLabel = index % 3 === 0;
-                return `<div class="group relative flex h-full min-w-0 flex-1 items-end" title="${item.hour}: ${item.total} ejecuciones, ${item.errors} errores"><div class="pulse-bar relative w-full overflow-hidden rounded-t-sm bg-indigo-500/15" style="height:${totalHeight}%"><div class="absolute bottom-0 w-full bg-emerald-500" style="height:${Math.max(0,totalHeight-errorHeight)}%"></div><div class="absolute top-0 w-full bg-rose-500" style="height:${errorHeight}%"></div></div>${showLabel ? `<span class="absolute -bottom-5 left-0 text-[9px] text-slate-400">${item.hour.slice(0,2)}</span>` : ''}</div>`;
+                return `
+                    <div class="group relative flex h-full min-w-0 flex-1 items-end" title="${item.hour}: ${item.total} ejecuciones, ${item.errors} errores">
+                        <div class="pulse-bar relative w-full overflow-hidden rounded-t-sm bg-indigo-500/15" style="height:${totalHeight}%">
+                            <div class="absolute bottom-0 w-full bg-emerald-500" style="height:${successHeight}%"></div>
+                            <div class="absolute top-0 w-full bg-rose-500" style="height:${errorHeight}%"></div>
+                        </div>
+                        ${showLabel ? `<span class="absolute -bottom-5 left-0 text-[9px] text-slate-400">${item.hour.slice(0, 2)}</span>` : ''}
+                    </div>`;
             }).join('');
         }
 
         function renderExecutions(items = []) {
             document.getElementById('executions-list').innerHTML = items.length ? items.map(item => {
-                const [label,dot] = statusMeta(item.status);
-                return `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="grid grid-cols-[10px_1fr_auto] items-center gap-3 rounded-md px-2 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800"><span class="h-2 w-2 rounded-full ${dot}"></span><span class="min-w-0"><span class="block truncate text-sm font-semibold">${escapeHtml(item.workflow_name)}</span><span class="text-xs text-slate-500">${escapeHtml(item.mode)} · ${formatDuration(item.duration_ms)}</span></span><span class="text-right text-xs text-slate-500"><span class="block">${label}</span>${formatTime(item.started_at)}</span></a>`;
+                const [label, dot] = statusMeta(item.status);
+                return `
+                    <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="grid grid-cols-[10px_1fr_auto] items-center gap-3 rounded-md px-2 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <span class="h-2 w-2 rounded-full ${dot}"></span>
+                        <span class="min-w-0">
+                            <span class="block truncate text-sm font-semibold">${escapeHtml(item.workflow_name)}</span>
+                            <span class="text-xs text-slate-500">${escapeHtml(item.mode)} | ${formatDuration(item.duration_ms)}</span>
+                        </span>
+                        <span class="text-right text-xs text-slate-500">
+                            <span class="block">${label}</span>
+                            ${formatTime(item.started_at)}
+                        </span>
+                    </a>`;
             }).join('') : '<p class="py-8 text-center text-sm text-slate-500">No hay ejecuciones recientes.</p>';
         }
 
         function renderWorkflows(items = dashboardData?.workflows || []) {
             const query = document.getElementById('workflow-search').value.trim().toLowerCase();
-            const filtered = items.filter(item => item.name.toLowerCase().includes(query));
+            const filtered = [...items]
+                .filter(item => item.name.toLowerCase().includes(query))
+                .sort((a, b) => {
+                    if ((b.errors_today || 0) !== (a.errors_today || 0)) return (b.errors_today || 0) - (a.errors_today || 0);
+                    return (b.executions_today || 0) - (a.executions_today || 0);
+                });
+
             document.getElementById('workflows-table').innerHTML = filtered.map(item => {
-                const [label,,badge] = statusMeta(item.last_status);
-                const rate = item.success_rate == null ? '—' : `${item.success_rate}%`;
-                return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-900/60"><td class="max-w-sm px-5 py-3"><div class="truncate font-semibold" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div><div class="text-xs text-slate-400">${escapeHtml(item.id)}</div></td><td class="px-5 py-3"><span class="inline-flex rounded px-2 py-1 text-xs font-semibold ${badge}">${label}</span></td><td class="px-5 py-3 font-semibold">${item.executions_today}</td><td class="px-5 py-3 ${item.errors_today ? 'font-bold text-rose-600 dark:text-rose-400' : ''}">${item.errors_today}</td><td class="px-5 py-3">${rate}</td><td class="px-5 py-3 text-slate-500">${formatTime(item.last_started_at)}</td><td class="px-5 py-3 text-right"><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir</a></td></tr>`;
+                const [label, , badge] = statusMeta(item.last_status);
+                const rate = item.success_rate == null ? '-' : `${item.success_rate}%`;
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/60">
+                        <td class="max-w-sm px-5 py-3">
+                            <div class="truncate font-semibold" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
+                            <div class="text-xs text-slate-400">${escapeHtml(item.id)}</div>
+                        </td>
+                        <td class="px-5 py-3"><span class="inline-flex rounded px-2 py-1 text-xs font-semibold ${badge}">${label}</span></td>
+                        <td class="px-5 py-3 font-semibold">${item.executions_today}</td>
+                        <td class="px-5 py-3 ${item.errors_today ? 'font-bold text-rose-600 dark:text-rose-400' : ''}">${item.errors_today}</td>
+                        <td class="px-5 py-3">${rate}</td>
+                        <td class="px-5 py-3 text-slate-500">${formatTime(item.last_started_at)}</td>
+                        <td class="px-5 py-3 text-right"><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Abrir</a></td>
+                    </tr>`;
             }).join('') || '<tr><td colspan="7" class="px-5 py-10 text-center text-slate-500">No hay coincidencias.</td></tr>';
+        }
+        function normalizeProject(item) {
+            const width = parseInt(item.progress, 10) || 0;
+            return `
+                <div>
+                    <div class="mb-1 flex justify-between gap-3 text-xs">
+                        <span class="font-semibold">${escapeHtml(item.name)}</span>
+                        <span class="text-indigo-600 dark:text-indigo-400">${escapeHtml(item.progress || '0%')}</span>
+                    </div>
+                    <div class="mb-1 flex justify-between text-[11px] text-slate-500">
+                        <span>${escapeHtml(item.status || 'Sin estado')}</span>
+                        <span>${width === 100 ? 'Cerrado' : width >= 70 ? 'Avanzado' : 'En progreso'}</span>
+                    </div>
+                    <div class="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"><div class="h-full rounded-full bg-indigo-500" style="width:${width}%"></div></div>
+                </div>`;
+        }
+
+        function normalizeTask(item) {
+            return `
+                <div class="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 ${item.done ? 'text-slate-400 line-through' : ''}">
+                    <span class="grid h-4 w-4 place-items-center rounded-full border ${item.done ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-400'}">${item.done ? '&#10003;' : ''}</span>
+                    ${escapeHtml(item.text)}
+                </div>`;
+        }
+
+        function renderExecutiveSummary(data) {
+            const workflows = Array.isArray(data.workflows) ? data.workflows : [];
+            const recent = Array.isArray(data.recent_executions) ? data.recent_executions : [];
+            const errorCount = workflows.filter(item => (item.errors_today || 0) > 0).length;
+            const heavyWorkflow = [...workflows].sort((a, b) => (b.executions_today || 0) - (a.executions_today || 0))[0];
+            const manualCount = recent.filter(item => item.mode === 'manual').length;
+
+            document.getElementById('executive-timestamp').textContent = data.generated_at ? formatDateTime(data.generated_at) : 'Sin datos';
+            document.getElementById('executive-summary').innerHTML = [
+                {
+                    label: 'Carga operativa',
+                    value: `${data.executions_today ?? 0}`,
+                    copy: `${data.successful_today ?? 0} correctas | ${data.critical_alerts ?? 0} alertas`
+                },
+                {
+                    label: 'Riesgo visible',
+                    value: errorCount ? `${errorCount} workflow(s)` : 'Sin riesgo',
+                    copy: errorCount ? 'Tienen errores hoy y van primero en la revision.' : 'No hay workflows con error en el corte actual.'
+                },
+                {
+                    label: 'Mayor volumen',
+                    value: heavyWorkflow ? escapeHtml(heavyWorkflow.name) : 'Sin datos',
+                    copy: heavyWorkflow ? `${heavyWorkflow.executions_today || 0} ejecuciones | ${manualCount} manuales recientes` : 'Aun no hay actividad suficiente.'
+                }
+            ].map(item => `
+                <div class="surface-soft rounded-lg p-4">
+                    <p class="text-xs font-semibold uppercase text-slate-500">${item.label}</p>
+                    <p class="mt-2 text-lg font-bold text-slate-950 dark:text-white">${item.value}</p>
+                    <p class="mt-2 text-xs text-slate-500">${item.copy}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderChanges(data, context = {}) {
+            const recent = (Array.isArray(data.recent_executions) ? data.recent_executions : [])
+                .slice(0, 3)
+                .map(item => ({
+                    title: item.workflow_name,
+                    meta: `${item.status || 'unknown'} | ${item.mode || 'unknown'} | ${formatTime(item.started_at)}`,
+                    impact: item.status === 'error' || item.status === 'crashed'
+                        ? 'Esta ejecucion fallo y afecta la lectura operativa del panel.'
+                        : 'Esta ejecucion confirma actividad reciente en n8n.'
+                }));
+
+            const curated = Array.isArray(context.changes) ? context.changes : [];
+            const merged = [...curated, ...recent].slice(0, 6);
+
+            document.getElementById('changes-count').textContent = `${merged.length} items`;
+            document.getElementById('changes-container').innerHTML = merged.length
+                ? merged.map(item => `
+                    <div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700">
+                        <p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(item.title || 'Cambio')}</p>
+                        <p class="mt-1 text-xs text-slate-500">${escapeHtml(item.meta || 'Sin metadata')}</p>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(item.impact || item.text || 'Sin detalle adicional.')}</p>
+                    </div>
+                `).join('')
+                : '<p class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500 dark:border-slate-700">Todavia no hay cambios para mostrar.</p>';
+        }
+
+        function renderContextSummary(context = {}) {
+            const projects = Array.isArray(context.projects) ? context.projects : [];
+            const tasks = Array.isArray(context.tasks) ? context.tasks : [];
+            const notes = Array.isArray(context.notes) ? context.notes : [];
+            const changes = Array.isArray(context.changes) ? context.changes : [];
+            const openTasks = tasks.filter(item => !item.done).length;
+            const doneTasks = tasks.filter(item => item.done).length;
+            const activeProjects = projects.filter(item => String(item.status || '').toLowerCase() === 'active').length;
+
+            document.getElementById('context-project-count').textContent = String(projects.length);
+            document.getElementById('context-project-copy').textContent = projects.length ? `${activeProjects} activo(s) | ${projects.length - activeProjects} en otro estado` : 'No hay proyectos cargados';
+            document.getElementById('context-task-open-count').textContent = String(openTasks);
+            document.getElementById('context-task-open-copy').textContent = tasks.length ? `${doneTasks} completadas | ${openTasks} pendientes` : 'No hay tareas cargadas';
+            document.getElementById('context-note-count').textContent = String(notes.length);
+            document.getElementById('context-note-copy').textContent = notes.length ? 'Recordatorios y contexto listos para consulta.' : 'No hay notas cargadas';
+            document.getElementById('context-change-count').textContent = String(changes.length);
+            document.getElementById('context-change-copy').textContent = changes.length ? 'Cambios curados listos para resumen ejecutivo.' : 'No hay cambios curados';
         }
 
         async function loadSystemMetrics() {
             refreshButton.disabled = true;
             document.getElementById('refresh-icon').classList.add('animate-spin');
             try {
-                const response = await fetch(`SYSTEM.json?v=${Date.now()}`, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                dashboardData = await response.json();
-                renderMetrics(dashboardData); renderActivity(dashboardData.hourly_activity); renderExecutions(dashboardData.recent_executions); renderWorkflows();
+                const [systemResponse, historyResponse] = await Promise.all([
+                    fetch(`SYSTEM.json?v=${Date.now()}`, { cache: 'no-store' }),
+                    fetch(`OPERATIONS_HISTORY.json?v=${Date.now()}`, { cache: 'no-store' })
+                ]);
+                if (!systemResponse.ok) throw new Error(`HTTP ${systemResponse.status}`);
+                dashboardData = await systemResponse.json();
+                sourceState.system = true;
+                renderMetrics(dashboardData);
+                renderExecutiveSummary(dashboardData);
+                renderIncidents(dashboardData);
+                renderTrends(dashboardData);
+                renderActivity(dashboardData.hourly_activity || []);
+                renderExecutions(dashboardData.recent_executions || []);
+                renderChanges(dashboardData, {});
+                renderWorkflows();
+                if (historyResponse.ok) {
+                    sourceState.history = true;
+                    renderHistory(await historyResponse.json());
+                } else {
+                    sourceState.history = false;
+                }
                 refreshCountdown = 60;
             } catch (error) {
+                sourceState.system = false;
+                sourceState.history = false;
                 document.getElementById('health-badge').className = 'flex h-10 items-center gap-2 rounded-lg border border-rose-300 bg-rose-50 px-3 text-sm font-semibold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300';
                 document.getElementById('health-badge').textContent = 'Datos no disponibles';
-                console.error('Error cargando métricas', error);
-            } finally { refreshButton.disabled = false; document.getElementById('refresh-icon').classList.remove('animate-spin'); }
+                document.getElementById('incident-summary').innerHTML = '<p class="text-sm text-rose-600 dark:text-rose-300">No se pudo cargar SYSTEM.json.</p>';
+                document.getElementById('incident-actions').innerHTML = '<p class="text-sm text-slate-500">Revisa el feed de datos o vuelve a sincronizar el dashboard.</p>';
+                document.getElementById('executive-summary').innerHTML = '<p class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500 dark:border-slate-700">No se pudo construir el resumen ejecutivo.</p>';
+                console.error('Error cargando metricas', error);
+            } finally {
+                renderSources();
+                refreshButton.disabled = false;
+                document.getElementById('refresh-icon').classList.remove('animate-spin');
+            }
         }
 
-        async function loadMarkdown() {
-            const request = name => fetch(`${name}?v=${Date.now()}`, { cache:'no-store' }).then(response => response.text());
-            const [projects,tasks,notes] = await Promise.all([request('PROJECTS.md'),request('TASKS.md'),request('NOTES.md')]);
-            document.getElementById('projects-container').innerHTML = projects.split('\n').filter(line => line.trim().startsWith('-')).map(line => { const [name,progress] = line.replace(/^- /,'').split('|').map(x=>x.trim()); return `<div><div class="mb-1 flex justify-between text-xs"><span class="font-semibold">${escapeHtml(name)}</span><span class="text-indigo-600 dark:text-indigo-400">${escapeHtml(progress || '0%')}</span></div><div class="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"><div class="h-full rounded-full bg-indigo-500" style="width:${parseInt(progress)||0}%"></div></div></div>`; }).join('');
-            document.getElementById('tasks-container').innerHTML = tasks.split('\n').filter(line=>line.trim().startsWith('-')).map(line=>{ const done=line.includes('[x]'); const text=line.replace(/^- \[[ x]\] /,'').replace(/^- /,''); return `<div class="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 ${done?'text-slate-400 line-through':''}"><span class="grid h-4 w-4 place-items-center rounded-full border ${done?'border-emerald-500 bg-emerald-500 text-white':'border-slate-400'}">${done?'✓':''}</span>${escapeHtml(text)}</div>`;}).join('');
-            document.getElementById('notes-container').innerHTML = notes.split('\n').filter(line=>line.trim().startsWith('-')).map(line=>`<p class="border-l-2 border-amber-400 pl-3 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(line.replace(/^- /,''))}</p>`).join('');
+        async function loadContext() {
+            try {
+                const response = await fetch(`DASHBOARD_CONTEXT.json?v=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const context = await response.json();
+                sourceState.context = true;
+                sourceState.markdownFallback = false;
+                document.getElementById('projects-container').innerHTML = (context.projects || []).map(normalizeProject).join('');
+                document.getElementById('tasks-container').innerHTML = (context.tasks || []).map(normalizeTask).join('');
+                document.getElementById('notes-container').innerHTML = (context.notes || []).map(item => `<p class="border-l-2 border-amber-400 pl-3 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(item)}</p>`).join('');
+                renderContextSummary(context);
+                renderChanges(dashboardData || {}, context);
+                renderSources();
+                return;
+            } catch (error) {
+                sourceState.context = false;
+                sourceState.markdownFallback = true;
+                console.warn('Fallback a Markdown para contexto', error);
+            }
+
+            const request = name => fetch(`${name}?v=${Date.now()}`, { cache: 'no-store' }).then(response => response.text());
+            const [projects, tasks, notes] = await Promise.all([request('PROJECTS.md'), request('TASKS.md'), request('NOTES.md')]);
+
+            document.getElementById('projects-container').innerHTML = projects
+                .split('\n')
+                .filter(line => line.trim().startsWith('-'))
+                .map(line => {
+                    const clean = line.replace(/^- /, '');
+                    const [name, progress, status] = clean.split('|').map(value => value.trim());
+                    return normalizeProject({ name, progress, status });
+                }).join('');
+
+            document.getElementById('tasks-container').innerHTML = tasks
+                .split('\n')
+                .filter(line => line.trim().startsWith('-'))
+                .map(line => {
+                    const done = line.includes('[x]');
+                    const text = line.replace(/^- \[[ x]\] /, '').replace(/^- /, '');
+                    return normalizeTask({ done, text });
+                }).join('');
+
+            document.getElementById('notes-container').innerHTML = notes
+                .split('\n')
+                .filter(line => line.trim().startsWith('-'))
+                .map(line => `<p class="border-l-2 border-amber-400 pl-3 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(line.replace(/^- /, ''))}</p>`)
+                .join('');
+            renderContextSummary({});
+            renderChanges(dashboardData || {}, {});
+            renderSources();
         }
 
         refreshButton.addEventListener('click', loadSystemMetrics);
         document.getElementById('workflow-search').addEventListener('input', () => renderWorkflows());
-        document.getElementById('date-display').textContent = new Intl.DateTimeFormat('es-ES',{weekday:'short',day:'numeric',month:'short'}).format(new Date());
-        setInterval(() => { refreshCountdown--; document.getElementById('refresh-status').textContent = `Actualiza en ${Math.max(0,refreshCountdown)}s`; if (refreshCountdown <= 0) loadSystemMetrics(); }, 1000);
-        loadSystemMetrics(); loadMarkdown().catch(error => console.error('Error cargando archivos auxiliares', error));
+        document.getElementById('date-display').textContent = new Intl.DateTimeFormat('es-PR', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
+
+        setInterval(() => {
+            refreshCountdown -= 1;
+            document.getElementById('refresh-status').textContent = `Actualiza en ${Math.max(0, refreshCountdown)}s`;
+            if (refreshCountdown <= 0) loadSystemMetrics();
+        }, 1000);
+
+        renderSources();
+        loadSystemMetrics();
+        loadContext().catch(error => console.error('Error cargando contexto', error));
     </script>
 </body>
 </html>
+
