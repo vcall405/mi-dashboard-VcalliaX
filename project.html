@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VcalliaX Project Details</title>
     <script>
+        const DATA_BASE_URL = 'https://raw.githubusercontent.com/vcall405/mi-dashboard-VcalliaX/data/';
+        const dataUrl = name => `${DATA_BASE_URL}${name}?v=${Date.now()}`;
         (() => {
             const saved = localStorage.getItem('theme');
             document.documentElement.classList.toggle(
@@ -302,8 +304,8 @@
         async function loadProjectSummary() {
             try {
                 const [systemResponse, historyResponse] = await Promise.all([
-                    fetch(`SYSTEM.json?v=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`OPERATIONS_HISTORY.json?v=${Date.now()}`, { cache: 'no-store' })
+                    fetch(dataUrl('SYSTEM.json'), { cache: 'no-store' }),
+                    fetch(dataUrl('OPERATIONS_HISTORY.json'), { cache: 'no-store' })
                 ]);
                 if (!systemResponse.ok) throw new Error(`HTTP ${systemResponse.status}`);
                 const data = await systemResponse.json();
@@ -336,7 +338,7 @@
         async function loadProjectContext(data) {
             let context = null;
             try {
-                const response = await fetch(`DASHBOARD_CONTEXT.json?v=${Date.now()}`, { cache: 'no-store' });
+                const response = await fetch(dataUrl('DASHBOARD_CONTEXT.json'), { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 context = await response.json();
                 document.getElementById('projects-list').innerHTML = (context.projects || []).map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><span class="font-semibold text-slate-900 dark:text-white">${item.name}</span><div class="mt-1 text-xs text-slate-500">${item.progress || '0%'} | ${item.status || 'Sin estado'}</div></div>`).join('');
