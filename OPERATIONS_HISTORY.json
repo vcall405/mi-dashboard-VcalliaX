@@ -1,6 +1,12 @@
 {
   "snapshots": [
     {
+      "date": "2026-08-19",
+      "executions_today": 0,
+      "success_rate": 0,
+      "critical_alerts": 0
+    },
+    {
       "date": "2026-08-18",
       "executions_today": 56,
       "success_rate": 100,
@@ -33,12 +39,6 @@
     {
       "date": "2026-08-13",
       "executions_today": 51,
-      "success_rate": 100,
-      "critical_alerts": 0
-    },
-    {
-      "date": "2026-08-12",
-      "executions_today": 52,
       "success_rate": 100,
       "critical_alerts": 0
     }
