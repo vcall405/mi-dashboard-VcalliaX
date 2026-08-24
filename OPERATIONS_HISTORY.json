@@ -2,9 +2,9 @@
   "snapshots": [
     {
       "date": "2026-08-24",
-      "executions_today": 44,
-      "success_rate": 75,
-      "critical_alerts": 11
+      "executions_today": 52,
+      "success_rate": 69,
+      "critical_alerts": 16
     },
     {
       "date": "2026-08-23",
