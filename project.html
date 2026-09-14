@@ -81,24 +81,12 @@
                     <h2 class="text-lg font-bold">Cobertura de automatizacion</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400">Estado real de lo que ya publica n8n y de lo que todavia falta automatizar en el workflow.</p>
                 </div>
-                <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">Parcialmente automatizado</span>
+                <span id="coverage-status" class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">Cargando</span>
             </div>
             <div class="mt-5 grid gap-3 md:grid-cols-3">
-                <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/70 dark:bg-emerald-950/30">
-                    <p class="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">Activo</p>
-                    <p class="mt-2 font-bold text-slate-900 dark:text-white">SYSTEM.json</p>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Publicado por <code class="font-semibold">Dashboard GitHub</code> cada 30 minutos.</p>
-                </div>
-                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/70 dark:bg-amber-950/30">
-                    <p class="text-xs font-semibold uppercase text-amber-700 dark:text-amber-300">Pendiente en n8n</p>
-                    <p class="mt-2 font-bold text-slate-900 dark:text-white">OPERATIONS_HISTORY.json</p>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">La UI lo consume, pero el flow aun no lo publica automaticamente.</p>
-                </div>
-                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/70 dark:bg-amber-950/30">
-                    <p class="text-xs font-semibold uppercase text-amber-700 dark:text-amber-300">Pendiente en n8n</p>
-                    <p class="mt-2 font-bold text-slate-900 dark:text-white">DASHBOARD_CONTEXT.json</p>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">La UI ya tiene soporte y fallback, pero falta publicacion automatica desde n8n.</p>
-                </div>
+                <div id="coverage-system" class="rounded-lg border p-4"></div>
+                <div id="coverage-history" class="rounded-lg border p-4"></div>
+                <div id="coverage-context" class="rounded-lg border p-4"></div>
             </div>
         </section>
 
@@ -229,6 +217,31 @@
             { title: 'Migrar contexto humano a JSON estructurado', status: 'done', detail: 'El proyecto ya carga DASHBOARD_CONTEXT.json y deja Markdown como respaldo.' }
         ];
 
+        const coverageState = { system: false, history: false, context: false };
+
+        function coverageCardHtml(label, active, activeCopy, pendingCopy) {
+            return active
+                ? `<p class="text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-300">Activo</p><p class="mt-2 font-bold text-slate-900 dark:text-white">${label}</p><p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${activeCopy}</p>`
+                : `<p class="text-xs font-semibold uppercase text-amber-700 dark:text-amber-300">Pendiente en n8n</p><p class="mt-2 font-bold text-slate-900 dark:text-white">${label}</p><p class="mt-1 text-sm text-slate-600 dark:text-slate-300">${pendingCopy}</p>`;
+        }
+
+        function renderCoverage() {
+            const cards = [
+                ['coverage-system', 'SYSTEM.json', coverageState.system, 'Publicado por <code class="font-semibold">Dashboard GitHub</code> cada 30 minutos.', 'No se pudo cargar en esta corrida.'],
+                ['coverage-history', 'OPERATIONS_HISTORY.json', coverageState.history, 'El flow ya publica snapshots diarios y la UI los usa para comparativas.', 'La UI lo consume, pero no se pudo cargar en esta corrida.'],
+                ['coverage-context', 'DASHBOARD_CONTEXT.json', coverageState.context, 'El flow publica este archivo y la UI lo consume directamente.', 'La UI tiene soporte y fallback, pero no se pudo cargar en esta corrida.']
+            ];
+            cards.forEach(([id, label, active, activeCopy, pendingCopy]) => {
+                const el = document.getElementById(id);
+                el.className = `rounded-lg border p-4 ${active ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/70 dark:bg-emerald-950/30' : 'border-amber-200 bg-amber-50 dark:border-amber-900/70 dark:bg-amber-950/30'}`;
+                el.innerHTML = coverageCardHtml(label, active, activeCopy, pendingCopy);
+            });
+            const allActive = coverageState.system && coverageState.history && coverageState.context;
+            const statusEl = document.getElementById('coverage-status');
+            statusEl.textContent = allActive ? '100% automatizado' : 'Parcialmente automatizado';
+            statusEl.className = `rounded-full px-2.5 py-1 text-[11px] font-semibold ${allActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`;
+        }
+
         function updateThemeButton() {
             const dark = root.classList.contains('dark');
             themeToggle.setAttribute('aria-label', dark ? 'Activar modo claro' : 'Activar modo oscuro');
@@ -309,6 +322,7 @@
                 ]);
                 if (!systemResponse.ok) throw new Error(`HTTP ${systemResponse.status}`);
                 const data = await systemResponse.json();
+                coverageState.system = true;
                 document.getElementById('project-generated').textContent = `SYSTEM.json | ${data.generated_at ? new Date(data.generated_at).toLocaleString('es-PR') : 'sin timestamp'}`;
                 document.getElementById('project-health').textContent = `Health: ${data.health || 'unknown'} | ${data.active_workflows ?? 0} workflows activos | ${data.executions_today ?? 0} ejecuciones hoy.`;
                 document.getElementById('project-alerts').textContent = String(data.critical_alerts ?? 0);
@@ -318,6 +332,7 @@
                 renderPlaybook(data);
                 renderNextStep(data);
                 if (historyResponse.ok) {
+                    coverageState.history = true;
                     const history = await historyResponse.json();
                     const latest = history.snapshots?.[0];
                     const previous = history.snapshots?.[1];
@@ -327,10 +342,12 @@
                         document.getElementById('project-history-copy').textContent = `Hoy ${latest.executions_today ?? 0} vs ayer ${previous.executions_today ?? 0}`;
                     }
                 }
+                renderCoverage();
                 return data;
             } catch (error) {
                 document.getElementById('project-health').textContent = 'No se pudo cargar el resumen operativo.';
                 console.error('Error cargando resumen del proyecto', error);
+                renderCoverage();
                 return null;
             }
         }
@@ -341,6 +358,7 @@
                 const response = await fetch(dataUrl('DASHBOARD_CONTEXT.json'), { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 context = await response.json();
+                coverageState.context = true;
                 document.getElementById('projects-list').innerHTML = (context.projects || []).map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700"><span class="font-semibold text-slate-900 dark:text-white">${item.name}</span><div class="mt-1 text-xs text-slate-500">${item.progress || '0%'} | ${item.status || 'Sin estado'}</div></div>`).join('');
                 document.getElementById('notes-list').innerHTML = (context.notes || []).map(item => `<div class="rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-700">${item}</div>`).join('');
             } catch (error) {
@@ -359,9 +377,11 @@
             }
 
             renderChanges(data || {}, context || {});
+            renderCoverage();
         }
 
         renderPlan();
+        renderCoverage();
         loadProjectSummary().then(loadProjectContext);
     </script>
 </body>

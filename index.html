@@ -95,10 +95,7 @@
                 <div class="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
                     Este panel usa <code class="font-semibold">SYSTEM.json</code>, <code class="font-semibold">OPERATIONS_HISTORY.json</code> y <code class="font-semibold">DASHBOARD_CONTEXT.json</code>, con fallback a <code class="font-semibold">PROJECTS.md</code>, <code class="font-semibold">TASKS.md</code> y <code class="font-semibold">NOTES.md</code>.
                 </div>
-                <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-200">
-                    <p class="font-semibold">Cobertura actual del flow</p>
-                    <p class="mt-1">El workflow <code class="font-semibold">Dashboard GitHub</code> automatiza <code class="font-semibold">SYSTEM.json</code>. El historico y el contexto estructurado ya existen en la UI, pero todavia requieren publicacion dedicada desde n8n para quedar 100% automaticos.</p>
-                </div>
+                <div id="coverage-banner" class="mt-3 rounded-lg border px-4 py-3 text-sm"></div>
             </article>
         </section>
 
@@ -139,7 +136,7 @@
                         <h2 class="text-lg font-bold">Historico operativo</h2>
                         <p class="text-xs text-slate-500">Lectura visual simple de los ultimos snapshots diarios.</p>
                     </div>
-                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">3 dias</span>
+                    <span id="history-days-badge" class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">Cargando</span>
                 </div>
                 <div id="history-bars" class="grid gap-3"></div>
             </article>
@@ -204,7 +201,13 @@
                     <h2 class="text-lg font-bold">Salud por workflow</h2>
                     <p class="text-xs text-slate-500">Errores primero, luego volumen, exito y ultima actividad.</p>
                 </div>
-                <input id="workflow-search" type="search" placeholder="Buscar workflow" class="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 sm:w-64">
+                <div class="flex flex-wrap items-center gap-3">
+                    <label class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <input id="workflow-hide-idle" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900">
+                        Ocultar sin actividad
+                    </label>
+                    <input id="workflow-search" type="search" placeholder="Buscar workflow" aria-label="Buscar workflow" class="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 sm:w-64">
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[760px] text-left text-sm">
@@ -329,12 +332,14 @@
             renderHealth(data);
         }
 
+        const isFailing = item => (item.errors_today || 0) > 0 || item.last_status === 'error' || item.last_status === 'crashed';
+
         function renderIncidents(data) {
             const workflows = [...(data.workflows || [])].sort((a, b) => {
                 if ((b.errors_today || 0) !== (a.errors_today || 0)) return (b.errors_today || 0) - (a.errors_today || 0);
                 return (b.executions_today || 0) - (a.executions_today || 0);
             });
-            const risky = workflows.filter(item => item.errors_today > 0).slice(0, 3);
+            const risky = workflows.filter(isFailing).slice(0, 3);
             const stale = workflows.filter(item => !item.last_started_at).slice(0, 2);
 
             document.getElementById('incident-summary').innerHTML = `
@@ -362,7 +367,13 @@
                 <p class="text-xs font-semibold uppercase text-slate-500">Acciones sugeridas</p>
                 <ul class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                     ${risky.length
-                        ? risky.map(item => `<li class="rounded-lg border border-rose-200 px-3 py-2 dark:border-rose-900">Revisar <span class="font-semibold">${escapeHtml(item.name)}</span> porque reporta <span class="font-semibold">${item.errors_today}</span> error(es) hoy.</li>`).join('')
+                        ? risky.map(item => {
+                            const todayErrors = item.errors_today || 0;
+                            const reason = todayErrors > 0
+                                ? `reporta <span class="font-semibold">${todayErrors}</span> error(es) hoy`
+                                : `su ultima ejecucion (${formatTime(item.last_started_at)}) termino en error y no ha vuelto a correr`;
+                            return `<li class="rounded-lg border border-rose-200 px-3 py-2 dark:border-rose-900">Revisar <span class="font-semibold">${escapeHtml(item.name)}</span> porque ${reason}.</li>`;
+                        }).join('')
                         : '<li class="rounded-lg border border-emerald-200 px-3 py-2 dark:border-emerald-900">No hay workflows con errores hoy. Prioridad en trazabilidad y frescura del feed.</li>'}
                     ${stale.length
                         ? `<li class="rounded-lg border border-slate-200 px-3 py-2 dark:border-slate-700">Validar workflows sin actividad reciente: ${stale.map(item => `<span class="font-semibold">${escapeHtml(item.name)}</span>`).join(', ')}.</li>`
@@ -373,7 +384,7 @@
 
         function renderTrends(data) {
             const workflows = data.workflows || [];
-            const risky = workflows.filter(item => (item.errors_today || 0) > 0);
+            const risky = workflows.filter(isFailing);
             const stale = workflows.filter(item => !item.last_started_at);
             const recent = (data.recent_executions || []).slice(0, 5);
             const recentErrors = recent.filter(item => item.status === 'error' || item.status === 'crashed').length;
@@ -389,6 +400,7 @@
         function renderHistory(history = {}) {
             const latest = history.snapshots?.[0];
             const previous = history.snapshots?.[1];
+            document.getElementById('history-days-badge').textContent = `${history.snapshots?.length || 0} dias`;
             if (!latest || !previous) return;
 
             const execDelta = (latest.executions_today ?? 0) - (previous.executions_today ?? 0);
@@ -420,6 +432,25 @@
                         </div>
                     </div>`;
             }).join('');
+        }
+
+        function renderCoverageBanner() {
+            const el = document.getElementById('coverage-banner');
+            const missing = [];
+            if (!sourceState.history) missing.push('OPERATIONS_HISTORY.json');
+            if (!sourceState.context) missing.push('DASHBOARD_CONTEXT.json');
+
+            if (missing.length === 0) {
+                el.className = 'mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/30 dark:text-emerald-200';
+                el.innerHTML = `
+                    <p class="font-semibold">Cobertura actual del flow</p>
+                    <p class="mt-1">El workflow <code class="font-semibold">Dashboard GitHub</code> publico los tres archivos (<code class="font-semibold">SYSTEM.json</code>, <code class="font-semibold">OPERATIONS_HISTORY.json</code>, <code class="font-semibold">DASHBOARD_CONTEXT.json</code>) en esta carga.</p>`;
+            } else {
+                el.className = 'mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-200';
+                el.innerHTML = `
+                    <p class="font-semibold">Cobertura actual del flow</p>
+                    <p class="mt-1">El workflow <code class="font-semibold">Dashboard GitHub</code> automatiza <code class="font-semibold">SYSTEM.json</code>. ${missing.map(name => `<code class="font-semibold">${name}</code>`).join(' y ')} aun no cargo en esta corrida (ver "Estado de fuentes" abajo).</p>`;
+            }
         }
 
         function renderSources() {
@@ -455,6 +486,7 @@
                     <p class="mt-2 text-xs text-slate-500">${item.copy}</p>
                 </div>
             `).join('');
+            renderCoverageBanner();
         }
 
         function renderActivity(items = []) {
@@ -495,9 +527,12 @@
 
         function renderWorkflows(items = dashboardData?.workflows || []) {
             const query = document.getElementById('workflow-search').value.trim().toLowerCase();
+            const hideIdle = document.getElementById('workflow-hide-idle').checked;
             const filtered = [...items]
                 .filter(item => item.name.toLowerCase().includes(query))
+                .filter(item => !hideIdle || isFailing(item) || (item.executions_today || 0) > 0)
                 .sort((a, b) => {
+                    if (isFailing(a) !== isFailing(b)) return isFailing(b) - isFailing(a);
                     if ((b.errors_today || 0) !== (a.errors_today || 0)) return (b.errors_today || 0) - (a.errors_today || 0);
                     return (b.executions_today || 0) - (a.executions_today || 0);
                 });
@@ -646,6 +681,7 @@
                     renderHistory(await historyResponse.json());
                 } else {
                     sourceState.history = false;
+                    document.getElementById('history-days-badge').textContent = 'Sin datos';
                 }
                 refreshCountdown = 60;
             } catch (error) {
@@ -717,6 +753,7 @@
 
         refreshButton.addEventListener('click', loadSystemMetrics);
         document.getElementById('workflow-search').addEventListener('input', () => renderWorkflows());
+        document.getElementById('workflow-hide-idle').addEventListener('change', () => renderWorkflows());
         document.getElementById('date-display').textContent = new Intl.DateTimeFormat('es-PR', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
 
         setInterval(() => {
