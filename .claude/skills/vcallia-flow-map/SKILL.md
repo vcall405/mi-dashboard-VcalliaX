@@ -1,59 +1,73 @@
 ---
 name: vcallia-flow-map
-description: Mapea, audita y valida el pipeline n8n -> GitHub -> Dashboard de este repo (Vcallia Operations Dashboard). Usar cuando se trabaje sobre el workflow de n8n "Dashboard GitHub" (tZy2OwAQAXNo44m8), cuando se audite qué archivos JSON (SYSTEM.json, OPERATIONS_HISTORY.json, DASHBOARD_CONTEXT.json) publica realmente un export de n8n frente a lo que espera el dashboard, cuando se actualice FLOW_GAP_ANALYSIS.md o N8N_DASHBOARD_EXPORT_SPEC.md, o cuando se valide que el JSON publicado cumple el contrato de datos.
+description: Mapea las conexiones reales entre Cloudflare Workers, workflows de n8n y servicios externos (Twilio, Vapi, WhatsApp/Meta, Cartesia, Resend, Google Maps, D1, KV) leyendo el código y los exports JSON directamente — sin AST genérico, sin vector store, sin dependencias externas. Usar cuando Miguel pida "mapear conexiones", "ver cómo se conecta X con Y", "qué toca este Worker", o antes de tocar un Worker/workflow que no se ha revisado en un tiempo.
 ---
 
 # Vcallia Flow Map
 
-Este skill documenta y automatiza la auditoría del pipeline operativo de Vcallia:
+Skill ligero y propio (no un fork de una herramienta de terceros) para mapear
+cómo se conectan los componentes del stack de Miguel: Cloudflare Workers,
+workflows de n8n, y los servicios externos que usa en sus proyectos de
+automatización (Twilio, Vapi, Cartesia, WhatsApp/Meta, Resend, Google Maps,
+D1, KV, Airtable, OpenAI, Anthropic).
 
-```
-n8n (n8n2.vcallia.com)
-  -> workflow "Dashboard GitHub" (tZy2OwAQAXNo44m8)
-    -> PUT a GitHub (este repo)
-      -> SYSTEM.json
-      -> OPERATIONS_HISTORY.json
-      -> DASHBOARD_CONTEXT.json
-        -> GitHub Pages
-          -> index.html / project.html (dashboard)
-```
+## Cuándo usar este skill
 
-Úsalo para responder "¿qué hace hoy el flow?", "¿qué le falta publicar?", "¿el JSON que llegó cumple el contrato?" sin releer todo el repo cada vez.
+- Antes de modificar un Worker o workflow que no se ha tocado en semanas.
+- Cuando Miguel pregunte "¿qué se conecta con qué?" en un proyecto.
+- Al hacer onboarding de un nuevo Worker o cliente al stack.
+- Como primer paso de un audit de seguridad (ver qué secretos/env vars
+  toca cada componente).
 
-## 1. Las tres fuentes de datos del dashboard
+## Cómo funciona
 
-El dashboard (`index.html`, `project.html`) lee tres archivos en la raíz del repo, publicados por el flow de n8n. El contrato completo vive en `N8N_DASHBOARD_EXPORT_SPEC.md` — no lo dupliques, referencia esta tabla resumen:
+`scripts/map_connections.py` escanea:
 
-| Archivo | Rol | Reglas clave |
-|---|---|---|
-| `SYSTEM.json` | Fuente operativa principal (estado en vivo) | Debe traer `generated_at` del mismo run; incluye `recent_executions`, `workflows`, `hourly_activity` |
-| `OPERATIONS_HISTORY.json` | Comparativas día a día | Array `snapshots` ordenado de más reciente a más antiguo; mínimo 7 si el flow puede; un snapshot por día |
-| `DASHBOARD_CONTEXT.json` | Contexto humano estructurado | `projects`, `tasks`, `notes`, `changes` |
+1. **Cloudflare Workers (.js/.mjs)**: busca
+   - `fetch("https://...")` con URL literal → conexión **EXTRACTED**
+   - `env.ALGO_URL` / `env.ALGO_API_KEY` cuyo nombre coincide con un
+     servicio conocido → conexión **INFERRED** (el nombre de la variable
+     sugiere el servicio, pero la URL no está fija en ese archivo)
+   - `request.headers.get("X-Algo-Secret")` → puntos de entrada autenticados
 
-Regla de publicación no negociable (de `N8N_DASHBOARD_EXPORT_SPEC.md`): **los tres archivos se publican en la misma ejecución**. Si uno falla, se marca el error y no se deja una mezcla de versiones (p. ej. `SYSTEM.json` de las 16:00 con `DASHBOARD_CONTEXT.json` de ayer).
+2. **Exports JSON de n8n** (opcional, con `--n8n`): lee el `type` de cada
+   nodo (ej. `n8n-nodes-base.twilio`, `...whatsApp`, `...httpRequest`) y
+   el campo `url` de los nodos HTTP Request → conexiones **EXTRACTED**
+   porque están explícitas en el JSON del propio workflow.
 
-`PROJECTS.md`, `TASKS.md`, `NOTES.md` en la raíz son **solo fallback manual** — el dashboard prioriza el JSON estructurado. No los trates como la fuente de verdad si el JSON existe y es reciente.
+Cada conexión queda etiquetada EXTRACTED (literal en el código) o INFERRED
+(deducida por convención de nombres) — mismo principio que usan las
+herramientas de knowledge graph, pero sin instalar nada de terceros ni
+mandar código a ningún servidor. Todo corre local.
 
-## 2. Cómo hacer una auditoría de flow (flow-gap-analysis)
-
-Cuando te den un export de n8n (JSON del workflow, o una lista de nodos) y te pidan auditarlo contra este dashboard:
-
-1. Identifica qué nodos escriben a GitHub (`PUT`/`Actualizar GitHub` sobre qué path).
-2. Para cada uno de los 3 archivos de la sección 1, marca: **automatizado** / **pendiente** / **desactualizado**.
-3. Si falta alguno, describe en 3-5 bullets qué necesitaría el nodo nuevo (leer SHA actual, decodificar JSON previo, insertar/actualizar, `PUT` con el nuevo SHA) — este es el patrón que ya usa el flow para `SYSTEM.json`.
-4. Verifica el orden recomendado (sección "Orden recomendado" de `N8N_DASHBOARD_EXPORT_SPEC.md`): recolectar estado n8n -> construir `SYSTEM.json` -> leer snapshot previo -> insertar snapshot del día -> construir `DASHBOARD_CONTEXT.json` -> publicar -> registrar resultado.
-5. Escribe o actualiza `FLOW_GAP_ANALYSIS.md` siguiendo su estructura existente (mismas secciones: `## Lo que hace hoy`, `## Nodos actuales relevantes`, `## Hallazgo principal`, `## Impacto en el dashboard`, `## Ajustes que faltan en n8n`, `## Salida esperada final`, `## Estado actual`). Mantén el tono: español, ASCII plano, sin acentos en encabezados de código/nombres de nodo, listas cortas — no reescribas todo el archivo si solo cambió una sección.
-
-## 3. Validar el JSON publicado
-
-Para comprobar que los tres archivos en la raíz del repo cumplen el contrato (campos requeridos, tipos, orden de snapshots), corre:
+## Uso
 
 ```bash
-python3 .claude/skills/vcallia-flow-map/scripts/validate_dashboard_json.py
+# Solo Workers de Cloudflare
+python3 scripts/map_connections.py ./ruta/a/workers --out ./flow-map-out
+
+# Workers + exports de n8n
+python3 scripts/map_connections.py ./ruta/a/workers --n8n ./ruta/a/n8n-exports --out ./flow-map-out
 ```
 
-Corre sobre `SYSTEM.json`, `OPERATIONS_HISTORY.json` y `DASHBOARD_CONTEXT.json` en la raíz del repo por defecto. Acepta rutas como argumentos si estás validando un export descargado antes de mergear (`--system`, `--history`, `--context`). Ver `references/data-contract.md` para el detalle campo por campo que usa el validador.
+Para obtener el código de un Worker ya desplegado en Cloudflare (sin tenerlo
+en local), usar la herramienta `workers_get_worker_code` del conector de
+Cloudflare, guardar el resultado como `.js`, y correr el script sobre esa
+carpeta.
 
-## 4. Otras memorias del repo (no confundir con el contrato del dashboard)
+## Salida
 
-`ops-memory/` es un sistema aparte: memoria operativa multi-proyecto (`ops-memory/index.json` + `projects/<id>.json`, `tasks/<id>.json`, `activity/<id>.json`, `requests/projects/*.json`, `requests/workflows/*.json`), alimentado por otro agente (`kimi`) vía webhook (`Ops Memory Sync Webhook` en n8n). No es parte del contrato de `N8N_DASHBOARD_EXPORT_SPEC.md` y no lo debe leer el dashboard directamente — trátalo como un log/planning store independiente salvo que te pidan explícitamente cruzarlo con el flow map.
+- `connections.md` — reporte legible, agrupado por componente, con las
+  conexiones salientes y su nivel de confianza.
+- `connections.json` — grafo completo (`nodes` + `edges`) para reutilizar
+  programáticamente o alimentar una visualización propia más adelante.
+
+## Limitaciones (léelas antes de confiar ciegamente en el resultado)
+
+- Las conexiones **INFERRED** son deducciones por nombre de variable, no
+  hechos confirmados — revísalas antes de tomar decisiones de seguridad.
+- No sigue redirecciones ni resuelve URLs construidas dinámicamente
+  (ej. `` `${env.BASE}/algo` ``) — esas quedan fuera del reporte.
+- No analiza n8n en vivo (vía API) todavía, solo exports JSON ya
+  descargados. Si se necesita eso, hay que agregar un paso que llame a la
+  API de n8n para bajar los workflows primero.
