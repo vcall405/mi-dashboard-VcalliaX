@@ -1,0 +1,37 @@
+name = "vapi-bridge"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+routes = [{ pattern = "api.vcallia.com/*", zone_name = "vcallia.com" }]
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[vars]
+N8N_WEBHOOK_URL = "https://n8n2.vcallia.com/webhook/vapi"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "abc123"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "clientes"
+database_id = "xyz"
+
+[[r2_buckets]]
+binding = "RECORDINGS"
+bucket_name = "call-recordings"
+
+[[queues.producers]]
+binding = "CALL_QUEUE"
+queue = "calls"
+
+[[queues.consumers]]
+queue = "calls"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "CallRoom"
+
+[env.staging.vars]
+N8N_WEBHOOK_URL = "https://n8n2.vcallia.com/webhook-test/vapi"

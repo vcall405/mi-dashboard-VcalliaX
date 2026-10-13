@@ -1,0 +1,9 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/app/leads-api', '.']
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'leads-api', '--image', 'us-docker.pkg.dev/$PROJECT_ID/app/leads-api', '--region', 'us-central1', '--set-secrets', 'META_TOKEN=meta-token:latest']
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: ['functions', 'deploy', 'notify-lead', '--gen2', '--runtime', 'python312', '--source', 'functions/notify', '--entry-point', 'notify_lead', '--trigger-topic', 'new-leads']

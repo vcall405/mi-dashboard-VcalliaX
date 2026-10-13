@@ -1,0 +1,17 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: leads-api
+spec:
+  template:
+    spec:
+      containers:
+        - image: us-docker.pkg.dev/proj/app/leads-api
+          env:
+            - name: GCP_PROJECT
+              value: vcallia-prod
+            - name: META_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: meta-token
+                  key: latest
